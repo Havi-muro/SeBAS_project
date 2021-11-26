@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Dec 14 10:08:22 2020
-@author: Janny
-This code builds a sequential deep learning model in keras.
-Data is normalized using the preprocessing.Normalzation() function
-training and validation points are distributed across the three exploratories
+@author: Javier Muro
+With this code we can create a model trained using all the observations
+No validations is performed here. Accuracy of model is the average 
+of the 5 folds of the crossvalidation
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -72,9 +72,36 @@ hist = pd.DataFrame(history.history)
 hist['epoch'] = history.epoch
 
 import plot_loss
-plot_loss.plot_loss(history, EPOCHS)
+plot_loss.plot_loss(history, EPOCHS, studyvar)
 
 # Measure RMSE using the validation (0.2%) data
 RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
 
-model.save('C:/Users/rsrg_javier/Desktop/SEBAS/Pymodules/SeBAS_modules/spatial/test_biom_model_S2bands')
+#model.save('spatial/test_biom_model_S2bands')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

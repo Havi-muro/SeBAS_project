@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 # Load datasets
-Mydataset_0 = pd.read_csv ('C:/Users/rsrg_javier/Desktop/SEBAS/Pymodules/SeBAS_modules/data/Bexis_S1S2_TS_sd_Nov2021.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_TS_sd_Nov2021.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -47,8 +47,8 @@ Mydataset_vars = Mydataset_0.drop([
      #'Year', 
      #'ep',
                     #### Study variables ####   
-        #'SpecRichness',
-        "biomass_g", 
+        'SpecRichness',
+        #"biomass_g", 
         'Shannon',
         'Simpson',
         'FisherAlpha',

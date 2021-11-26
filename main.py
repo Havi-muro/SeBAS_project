@@ -20,8 +20,7 @@ have to fix
 @author: Javier Muro
 """
 
-cd C:\Users\rsrg_javier\Desktop\SEBAS\Pymodules
-#mypath = str('C:\\Users\\rsrg_javier\\Desktop\\SeBAS_DNN_project')
+cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
 
 #conda activate earth-analytics-python
 
