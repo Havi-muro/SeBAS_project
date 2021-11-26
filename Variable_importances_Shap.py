@@ -248,7 +248,7 @@ for train, test in kfold.split(x):
     rsq_list.append(rsq)
         
     #Calculate the relative root mean squared error
-    test_mean = np.mean(test_labels)
+    test_mean = np.median(test_labels)
     RRMSE_test = (RMSE_test / test_mean)
     RMSE_test_list.append(RMSE_test)
     RRMSE_test_list.append(RRMSE_test)
@@ -274,18 +274,7 @@ for train, test in kfold.split(x):
     
     var_imp_list.append(feature_importance)
 
-#concatenate all variable importances side by side    
-var_imp_df = pd.concat(var_imp_list, axis=1)
-
-# Select useful columns
-var_imp_df= dfs.iloc[:,[0,1,3,5,7,9]].set_index('col_name')
-
-# Calculate the mean of each variable importance across folds
-var_imp_mean = dfs2.mean(axis=1)
-
-var_imp_mean.to_csv('var_imp_kfold_biomass_all_vars.csv')
-
-      
+     
 #print average RMSE
 print(f"RMSE test Median: {statistics.median(RMSE_test_list)}")
 print(f"RMSE test StdDev: {statistics.stdev(RMSE_test_list)}")
@@ -298,7 +287,16 @@ print(f"RRMSE test StDev: {statistics.stdev(RRMSE_test_list)}")
 print(f"r squared Median: {statistics.median(rsq_list)}") 
 print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
+#concatenate all variable importances side by side    
+var_imp_df = pd.concat(var_imp_list, axis=1)
 
+# Select useful columns
+var_imp_df= dfs.iloc[:,[0,1,3,5,7,9]].set_index('col_name')
+
+# Calculate the mean of each variable importance across folds
+var_imp_mean = dfs2.mean(axis=1)
+
+#var_imp_mean.to_csv('var_imp_kfold_biomass_all_vars.csv')
 
 
 ##############################################################################

@@ -24,7 +24,6 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 
-
 import os
 #conda install -c pratyusht pyrsgis
 #conda install --channel "pratyusht" package
@@ -33,9 +32,9 @@ from pyrsgis import raster
 from pyrsgis.convert import changeDimension
 import rasterio
 
+from glob import glob
 
 # cd C:/Users/rsrg_javier/Desktop/SEBAS/
-
 
 ##############################################################################################
 
@@ -69,8 +68,7 @@ import rasterio
 #     dst.write(uno)
             
 # Import all bands in a list and stack them     
-from glob import glob
-file_list = glob("C:/Users/rsrg_javier/Desktop/SEBAS/GIS/RS/SCH/SCH2017/sch*b*.tif")
+file_list = glob("data/rs/alb*.tif")
 
 # Delete the items as necessary
 #del file_list[11:13]
@@ -85,8 +83,8 @@ arr_st, meta = es.stack(file_list)
 # Concatenate both np.ndarrays. 
 # We have to convert them in list or tuples first (with the parenthesis)
 # Not needed for the moment. Models work the same ignoring which exploratory we are modelling
-#arr_st = np.concatenate((uno, arr_st))
-#type(arr_st)
+# arr_st = np.concatenate((uno, arr_st))
+# type(arr_st)
 
 ############   Mask out weird values just for visualization   ################
 arr_st_masked = np.ma.masked_values(arr_st, np.amin(arr_st))
@@ -102,27 +100,29 @@ plt.show()
 fig, ax = plt.subplots(figsize=(12, 12))
 ep.plot_bands(arr_st)
 plt.show()
-# earthpy identifies it as raster stack, so all good
 
 ##############################################################################
 
-#write the full stack
+# write the full stack
 meta.update(count = arr_st.shape[0])
-with rasterio.open('C:/Users/rsrg_javier/Desktop/SEBAS/GIS/RS/SCH/SCH2017/sch_fullstack_2017.tif', 'w', **meta, BIGTIFF='YES') as dst:
+with rasterio.open('data/rs/alb_2017_test.tif', 'w', **meta, BIGTIFF='YES') as dst:
         dst.write(arr_st)
 
 ###############################################################################
 
-# Read raster with exploratory as first band (model reads it like that)
+# Read raster with exploratory as first band in case it was used in model
 
-ds1, myrast = raster.read('C:/Users/rsrg_javier/Desktop/SEBAS/GIS/RS/SCH/SCH2017/sch_fullstack_2017.tif', bands='all')
+ds1, myrast = raster.read('data/rs/alb_2017_test.tif', bands='all')
 print(np.amax(myrast))
 print(np.amin(myrast))
 
-##############  Mask out no data values, only for vsualization  ##############
+##############  Mask out extreme values, only for visualization  ##############
 myrast_masked = np.ma.masked_values(myrast, np.amin(myrast))
+myrast_masked = np.ma.masked_values(myrast_masked, np.amax(myrast))
+
 print(np.amax(myrast_masked))
 print(np.amin(myrast_masked))
+
 
 #Plot raster and histgram
 fig, ax = plt.subplots(figsize=(12, 12))
@@ -134,11 +134,12 @@ ep.hist(myrast_masked)
 plt.show()
 ###############################################################################
 
-#Change raster dymensions. No need to normalize, since the model performs normalization
+#Change raster dymensions. 
+#No need to normalize, since the model performs normalization
 myrast_reshape = changeDimension(myrast)
 
 # Read model
-model = keras.models.load_model('C:/Users/rsrg_javier/Desktop/SEBAS/python/SppRich_model/Apr_Oct')
+model = keras.models.load_model('data/rs/BiomassModel')
 
 #Apply model
 myrast_pred = model.predict(myrast_reshape)
@@ -169,4 +170,4 @@ ep.hist(predict_masked, figsize=(5,5))
 prediction = np.reshape(predict_masked, (ds1.RasterYSize, ds1.RasterXSize))
 plt.imshow(prediction)
 
-raster.export(prediction, ds1, filename='C:/Users/rsrg_javier/Desktop/SEBAS/GIS/RS/SCH/SCH2017/sch_sppRich_2017.tif', dtype='float')
+#raster.export(prediction, ds1, filename='data/rs/biomass_alb_2017.tif', dtype='float')
