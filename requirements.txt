@@ -32,7 +32,7 @@ branca @ file:///home/conda/feedstock_root/build_artifacts/branca_1609346930842/
 brotlipy==0.7.0
 cachetools @ file:///home/conda/feedstock_root/build_artifacts/cachetools_1619593780156/work
 Cartopy @ file:///D:/bld/cartopy_1621579375027/work
-certifi==2021.5.30
+certifi==2021.10.8
 cffi @ file:///D:/bld/cffi_1625835497933/work
 cftime @ file:///D:/bld/cftime_1621553914127/work
 chardet @ file:///D:/bld/chardet_1610093646853/work
@@ -258,9 +258,11 @@ scipy @ file:///C:/bld/scipy_1624825036206/work
 seaborn @ file:///home/conda/feedstock_root/build_artifacts/seaborn-split_1611834504644/work
 segregation @ file:///home/conda/feedstock_root/build_artifacts/segregation_1623888915152/work
 Send2Trash @ file:///home/conda/feedstock_root/build_artifacts/send2trash_1624366715919/work
+shap @ file:///D:/bld/shap_1635082159842/work
 Shapely==1.7.1
 simplejson @ file:///D:/bld/simplejson_1625889916399/work
 six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
+slicer @ file:///home/conda/feedstock_root/build_artifacts/slicer_1608146800664/work
 sniffio @ file:///D:/bld/sniffio_1610318539925/work
 snowballstemmer @ file:///tmp/build/80754af9/snowballstemmer_1611258885636/work
 snuggs==1.4.7
