@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 # Load datasets
-Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_TS_sd_Nov2021.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1_S2yearTS_height_Dec2021.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -42,14 +42,15 @@ Mydataset_vars = Mydataset_0.drop([
     
                 #### Identification variables ####
     'x', 'y', 
-    #'explo', 
+    'explo', 
     # 'yep',
      #'Year', 
      #'ep',
                     #### Study variables ####   
         'SpecRichness',
-        #"biomass_g", 
-        'Shannon',
+        'height_cm',
+        "biomass_g", 
+        #'Shannon',
         'Simpson',
         'FisherAlpha',
         'PielouEvenness',
@@ -66,7 +67,7 @@ Mydataset_vars = Mydataset_0.drop([
                   'VHMean_May',
                   'VVMean_May',
                   'VVVH',
-                  #'TWI'
+                  'TWI'
              
        ], axis=1)
 
@@ -75,15 +76,26 @@ list(Mydataset_vars.columns)
 # Select study variable and predictors by subsetting
 # keep variable 'explo' for spatial cross-validation
 
-#Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018', 
-                               # 'explo',
-#                                'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
-                               #,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI'
-                               #,'VHMean_May','VVMean_May','VVVH'
-                               #,'SoilTypeFusion'
-                               #,'slope'
-                               #,'TWI'
-#                               ]]
+# Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018', 
+#                                # 'explo',
+#                                 'blue',
+#                                 #'green', 
+#                                 #'red', 
+#                                 'nir', 
+#                                 'nirb', 
+#                                 're1',
+#                                 're2',
+#                                 're3', 
+#                                 'swir1', 
+#                                 #'swir2'
+# #                               ,'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
+
+#                                # ,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI'
+#                                #,'VHMean_May','VVMean_May','VVVH'
+#                                #,'SoilTypeFusion'
+#                                #,'slope', 'aspect'
+#                                #,'TWI'
+#                                ]]
 
 # nir_3 corresponds to Mid may. 
 # The differences in correlation between the orignial band and nir_3

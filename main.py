@@ -48,8 +48,10 @@ print(Mydataset.head())
 ##############################################################################
 
 # 1.- K-fold with DNN
-EPOCHS = 200 # try to set the number of epochs here, as well as other parameters
 import kfold_DNN
+
+EPOCHS = 200 
+
 kfold_DNN.kfold_DNN(EPOCHS, studyvar)
 
 #Put results as variables in global environment
@@ -66,7 +68,7 @@ LOFO_Ordered_list = kfold_DNN.LOFO_Ordered_list
 
 # 2.- kfold approach with RF
 import kfold_RF
-kfold_RF.kfold_RF()
+kfold_RF.kfold_RF(studyvar)
 
 # Put results as variables in global environment
 RMSE_test_list = kfold_RF.RMSE_test_list
@@ -102,18 +104,18 @@ rsq_list = spcv_DNN.rsq_list
 
 predictions_list = spcv_DNN.predictions_list
 
-##############################################################################
+###############################################################################
 
 #print average RMSE
-print(f"RMSE test Median: {statistics.median(RMSE_test_list)}")
+print(f"RMSE test Mean: {statistics.mean(RMSE_test_list)}")
 print(f"RMSE test StdDev: {statistics.stdev(RMSE_test_list)}")
 
 #print average RRSME
-print(f"RRMSE test Median: {statistics.median(RRMSE_test_list)}") 
+print(f"RRMSE test Mean: {statistics.mean(RRMSE_test_list)}") 
 print(f"RRMSE test StDev: {statistics.stdev(RRMSE_test_list)}")
 
 #print average r squared in validation
-print(f"r squared Median: {statistics.median(rsq_list)}") 
+print(f"r squared Mean: {statistics.mean(rsq_list)}") 
 print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
 ###############################################################################
@@ -158,7 +160,7 @@ plt.ylabel('loss value')
 # create stats to export to csv
 varimp_stats = varimp.describe()
 varimp_statst = varimp_stats.transpose()
-#varimp_statst.to_csv(f'C:/Users/rsrg_javier/Desktop/SEBAS/python/Var_imp_RF_{studyvar}_May.csv')
+varimp_statst.to_csv(f'results/Var_imp_kfold_RF_{studyvar}.csv')
 
 ###############################################################################
 
@@ -197,13 +199,13 @@ plt.ylim(0, max(Mydataset[studyvar]))
 #plt.savefig(f'{studyvar}allfolds_plot2.svg')# plot without the line
 
 #add a r=1 line
-x = np.array([0,max(Mydataset[studyvar])])
-plt.plot(x,x,lw=1, c="black")
+line = np.array([0,max(Mydataset[studyvar])])
+plt.plot(line,line,lw=1, c="black")
 plt.show()
 
 ###############################################################################
 
-################################################################################
+###############################################################################
 
 #Make a density plot
 from scipy.stats import gaussian_kde
@@ -224,10 +226,10 @@ plt.ylabel(f'Predicted {studyvar}')
 plt.xlabel(f'In situ values {studyvar}')
 plt.xlim(0, max(Mydataset[studyvar]))
 plt.ylim(0, max(Mydataset[studyvar]))
-plt.show()
 
 #plt.savefig(f'{studyvar} allfolds_densitypolot_DNN.svg')# plot without the line
 
 #add a r=1 line
-line = np.array([0,max(y)])
-plt.plot(z,z,lw=1, c="black")
+line = np.array([0,max(Mydataset[studyvar])])
+plt.plot(line,line,lw=1, c="black")
+plt.show()

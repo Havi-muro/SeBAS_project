@@ -35,11 +35,8 @@ from tensorflow.keras.layers.experimental import preprocessing
 import be_preprocessing
 # Create an object with the result of  the preprocessing module
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'biomass_g'
 
 
-# Define the K-fold Cross Validator
-kfold = KFold(5, shuffle=False)
 
 RMSE_test_list = []
 RRMSE_test_list = []
@@ -50,13 +47,18 @@ predictions_list=[]
 
 importance_list = []
 
-#Create y (labels) and x (features)
-x_columns = Mydataset.columns.drop(studyvar)
-x = Mydataset[x_columns].values
-y = Mydataset[studyvar].values
 
 # K-fold Cross Validation model evaluation
-def kfold_RF():
+def kfold_RF(studyvar):
+    
+    # Define the K-fold Cross Validator
+    kfold = KFold(5, shuffle=False)
+    
+    #Create y (labels) and x (features)
+    x_columns = Mydataset.columns.drop(studyvar)
+    x = Mydataset[x_columns].values
+    y = Mydataset[studyvar].values
+    
     fold = 0
     for train, test in kfold.split(x):
         fold+=1

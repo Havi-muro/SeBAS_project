@@ -37,7 +37,7 @@ shap.initjs()
 
 cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
 # Load datasets
-Mydataset_0 = pd.read_csv ('data/Bexis_S1_S2yearTS_twi_Jul2021.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1_S2yearTS_height_Dec2021.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -68,24 +68,25 @@ Mydataset_vars = Mydataset_0.drop(['x', 'y',
      'yep',
               #'Year', 'ep',
               'SpecRichness',
-              #"biomass_g", 
+              #'height_cm',
+              "biomass_g", 
               'Shannon',
               'Simpson',
               'FisherAlpha',
               'PielouEvenness',
               'number_vascular_plants',
               "LUI_2015_2018",
-              #"SoilTypeFusion" ,
-              #'LAI',
-              #'slope',
-              #'aspect',
+              "SoilTypeFusion" ,
+              'LAI',
+              'slope',
+              'aspect',
               'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
               
-              #'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
-              #'VHMean_May',
-              #'VVMean_May',
-              #'VVVH',
-              #'TWI'
+              'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
+              'VHMean_May',
+              'VVMean_May',
+              'VVVH',
+              'TWI'
              
        ], axis=1)
 
@@ -93,10 +94,11 @@ list(Mydataset_vars.columns)
 
 Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 
                                 'blue_3','green_3', 'red_3', 'nir_3', 'nirb_3', 're1_3', 're2_3', 're3_3', 'swir1_3', 'swir2_3'
+                                #,'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3', 're2_sd_3', 're3_sd_3', 'swir1_sd_3', 'swir2_sd_3'
                                 ,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI'
                                 ,'VHMean_May','VVMean_May','VVVH'
-                                ,'SoilTypeFusion'
-                                ,'slope'
+                                #,'SoilTypeFusion'
+                                ,'slope', 'aspect'
                                 ,'TWI'
                                 ]]
 
@@ -228,7 +230,7 @@ for train, test in kfold.split(x):
     hist = pd.DataFrame(history.history)
     hist['epoch'] = history.epoch
        
-    plot_loss(history)
+    #plot_loss(history)
     
     # Measure this fold's RMSE using the validation (0.2%) data
     RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
@@ -276,35 +278,37 @@ for train, test in kfold.split(x):
 
      
 #print average RMSE
-print(f"RMSE test Median: {statistics.median(RMSE_test_list)}")
+print(f"RMSE test Mean: {statistics.mean(RMSE_test_list)}")
 print(f"RMSE test StdDev: {statistics.stdev(RMSE_test_list)}")
 
 #print average RRSME
-print(f"RRMSE test Median: {statistics.median(RRMSE_test_list)}") 
+print(f"RRMSE test Mean: {statistics.mean(RRMSE_test_list)}") 
 print(f"RRMSE test StDev: {statistics.stdev(RRMSE_test_list)}")
 
 #print average r squared in validation
-print(f"r squared Median: {statistics.median(rsq_list)}") 
+print(f"r squared Mean: {statistics.mean(rsq_list)}") 
 print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
 #concatenate all variable importances side by side    
 var_imp_df = pd.concat(var_imp_list, axis=1)
 
 # Select useful columns
-var_imp_df= dfs.iloc[:,[0,1,3,5,7,9]].set_index('col_name')
+var_imp_df= var_imp_df.iloc[:,[0,1,3,5,7,9]].set_index('col_name')
 
 # Calculate the mean of each variable importance across folds
-var_imp_mean = dfs2.mean(axis=1)
+var_imp_mean = var_imp_df.mean(axis=1)
+var_imp_sd = var_imp_df.std(axis=1)
 
-#var_imp_mean.to_csv('var_imp_kfold_biomass_all_vars.csv')
+var_imp = pd.concat([var_imp_mean, var_imp_sd], axis=1)
+
+var_imp.to_csv(f'var_imp_kfold_DNN_{studyvar}.csv')
 
 
 ##############################################################################
 #                              Tests & notes
 ##############################################################################
 # print the JS visualization code to the notebook
-import shap
-shap.initjs()
+
 
 # In case we need to flaten
 # def flatten(t):
@@ -358,7 +362,7 @@ feature_importance = pd.DataFrame(list(zip(feature_names, sum(vals))),
 #                               ascending=False, inplace=True)
 feature_importance.head()
 
-feature_importance.to_csv('feature_importance_test2.csv')
+feature_importance.to_csv('results/feature_importance_test2.csv')
 
 
 x_cat = x.copy()
