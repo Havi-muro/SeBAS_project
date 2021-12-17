@@ -20,7 +20,7 @@ have to fix
 @author: Javier Muro
 """
 
-cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
+cd C:\Users\Janny\Documents\GitHub\SeBAS_project
 
 #conda activate earth-analytics-python
 
@@ -41,9 +41,10 @@ import be_preprocessing
 # We have to define this to explore the dataset we work with
 # and to relate results to other variables in the plots afterwards
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'Shannon'
+studyvar = 'NMDS1'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
+print(list(Mydataset.columns))
 
 ##############################################################################
 
