@@ -20,7 +20,7 @@ have to fix
 @author: Javier Muro
 """
 
-cd C:\Users\Janny\Documents\GitHub\SeBAS_project
+cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
 
 #conda activate earth-analytics-python
 
@@ -41,7 +41,7 @@ import be_preprocessing
 # We have to define this to explore the dataset we work with
 # and to relate results to other variables in the plots afterwards
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'NMDS1'
+studyvar = 'SpecRich_157'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -62,8 +62,8 @@ rsq_list = kfold_DNN.rsq_list
 
 predictions_list = kfold_DNN.predictions_list
 
-LOFO_list = kfold_DNN.LOFO_list
-LOFO_Ordered_list = kfold_DNN.LOFO_Ordered_list
+#LOFO_list = kfold_DNN.LOFO_list
+#LOFO_Ordered_list = kfold_DNN.LOFO_Ordered_list
 
 ##############################################################################
 
@@ -88,14 +88,14 @@ importance_list = kfold_RF.importance_list
 import spcv_DNN
 
 # Choose which site is used for test and which one(s) for training
-EPOCHS = 100
-train_dataset = Mydataset[(Mydataset['explo']=='SCH')       
+EPOCHS = 300
+train_dataset = Mydataset[(Mydataset['explo']=='HAI')       
                           | (Mydataset['explo'] == 'ALB')   # take this line out to use only 1 site for training
                           ].drop(['explo'], axis=1)
                             
-test_dataset = Mydataset[Mydataset['explo']=='HAI'].drop(['explo'], axis=1)
+test_dataset = Mydataset[Mydataset['explo']=='SCH'].drop(['explo'], axis=1)
 
-spcv_DNN.spcv_DNN(EPOCHS, train_dataset, test_dataset)
+spcv_DNN.spcv_DNN(EPOCHS, train_dataset, test_dataset, studyvar)
 
 # Put results as variables in global environment
 
@@ -179,6 +179,9 @@ test_preds2 = pd.merge(MydatasetLUI,test_preds,
                        how = 'right',
                        left_index = True, 
                        right_index = True)
+
+preds_test = test_preds2[['Year', 'ep', 'SpecRich_157', 'preds']]
+preds_test.to_csv('results/preds_vs_test_SpeccRich_157_RF.csv')
 
 test_preds2 = test_preds2.rename(columns = {'LUI_2015_2018':'LUI'})
 

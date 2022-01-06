@@ -36,7 +36,6 @@ import modelDNN
 
 # Create an object with the result of  the preprocessing module
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'biomass_g' 
 
 # Create empty lists to store results of folds
 RMSE_test_list = []
@@ -49,14 +48,13 @@ predictions_list = []
 LOFO_list = []
 LOFO_Ordered_list = []
 
-def spcv_DNN(EPOCHS, train_dataset, test_dataset):
+def spcv_DNN(EPOCHS, train_dataset, test_dataset, studyvar):
  
     for iteration in range(5):
     # Recommended to shuffle here, since despite the shuffle is True by default when we fit the model,
     # the validation data has to be suffled before it is separated from the training data
         #Mydataset = shuffle(Mydataset)
-        
-       
+               
         # Copy features
         train_features = train_dataset.copy()
         test_features = test_dataset.copy()
@@ -95,7 +93,7 @@ def spcv_DNN(EPOCHS, train_dataset, test_dataset):
         hist = pd.DataFrame(history.history)
         hist['epoch'] = history.epoch
            
-        plot_loss(history, EPOCHS)
+        plot_loss(history, EPOCHS, studyvar)
         
         # Measure this fold's RMSE using the validation (0.2%) data
         RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
@@ -141,4 +139,4 @@ def spcv_DNN(EPOCHS, train_dataset, test_dataset):
         # LOFO_Ordered_list.append(LOFO_Ordered)
           
 if __name__ == "__main__":
-    spcv_DNN(EPOCHS, train_dataset, test_dataset)
+    spcv_DNN(EPOCHS, train_dataset, test_dataset, studyvar)

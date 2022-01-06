@@ -11,7 +11,6 @@ importance of each fold
 @author: Javier Muro
 
 """
-
 from sklearn.model_selection import KFold
 from sklearn import metrics
 #from sklearn import preprocessing
@@ -112,10 +111,12 @@ def kfold_DNN(EPOCHS, studyvar):
         #print(f"RMSE test data: {RMSE_test}")
         
         # Calculate r2 between predicted and test data
-        linreg = sp.stats.linregress(test_predictions ,test_labels)
+        linreg = sp.stats.linregress(test_predictions, test_labels)
         rsq = linreg.rvalue **2
+        #rsq = metrics.r2_score(test_predictions, test_labels)
+
         rsq_list.append(rsq)
-        p = linreg.pvalue
+        # p = linreg.pvalue
         # p_list.append(p)
             
         #Calculate the relative root mean squared error
@@ -140,6 +141,8 @@ def kfold_DNN(EPOCHS, studyvar):
         LOFO, LOFO_Ordered = LOFO(model, train_features, train_labels)
         LOFO_list.append(LOFO)
         LOFO_Ordered_list.append(LOFO_Ordered)
+        
+    return model
           
 #if __name__ == "__main__":
 #    kfold_DNN(EPOCHS)

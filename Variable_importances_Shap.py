@@ -37,7 +37,7 @@ shap.initjs()
 
 cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
 # Load datasets
-Mydataset_0 = pd.read_csv ('data/Bexis_S1_S2yearTS_height_Dec2021.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_Dec2021.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -68,14 +68,21 @@ Mydataset_vars = Mydataset_0.drop(['x', 'y',
      'yep',
               #'Year', 'ep',
               'SpecRichness',
-              #'height_cm',
+              'height_cm',
               "biomass_g", 
               'Shannon',
               'Simpson',
               'FisherAlpha',
               'PielouEvenness',
               'number_vascular_plants',
+              'NMDS1',
+              'NMDS2',
+              #'SpecRich_157',
+              'Rao_Q',
+              'Redundancy',
+              
               "LUI_2015_2018",
+              
               "SoilTypeFusion" ,
               'LAI',
               'slope',
@@ -92,7 +99,19 @@ Mydataset_vars = Mydataset_0.drop(['x', 'y',
 
 list(Mydataset_vars.columns)
 
-Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 
+# Make lists to remove correlated bands for species diversity predictions
+removeswir2 = list(Mydataset_vars.filter(regex ='^swir2'))
+removeblue = list(Mydataset_vars.filter(regex ='^blue'))
+removere1 = list(Mydataset_vars.filter(regex ='^re1'))
+removere2 = list(Mydataset_vars.filter(regex ='^re2'))
+
+removevars = removeblue+removeswir2
+
+Mydataset_vars=Mydataset_vars.drop(removevars, axis=1)
+
+
+# Select variables for biomass and height predictions
+Mydataset_vars = Mydataset_0[['Year', 'ep', 'SpecRich_157', 
                                 'blue_3','green_3', 'red_3', 'nir_3', 'nirb_3', 're1_3', 're2_3', 're3_3', 'swir1_3', 'swir2_3'
                                 #,'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3', 're2_sd_3', 're3_sd_3', 'swir1_sd_3', 'swir2_sd_3'
                                 ,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI'
@@ -105,7 +124,7 @@ Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g',
 # nir_3 corresponds to Mid may. 
 # The differences in correlation between the orignial band and nir_3
 # correspond to SCH, because the original is two weeks later
-studyvar = 'biomass_g'
+studyvar = 'SpecRich_157'
 
 
 #replace nas with mean?
@@ -277,15 +296,15 @@ for train, test in kfold.split(x):
     var_imp_list.append(feature_importance)
 
      
-#print average RMSE
+# print average RMSE
 print(f"RMSE test Mean: {statistics.mean(RMSE_test_list)}")
 print(f"RMSE test StdDev: {statistics.stdev(RMSE_test_list)}")
 
-#print average RRSME
+# print average RRSME
 print(f"RRMSE test Mean: {statistics.mean(RRMSE_test_list)}") 
 print(f"RRMSE test StDev: {statistics.stdev(RRMSE_test_list)}")
 
-#print average r squared in validation
+# print average r squared in validation
 print(f"r squared Mean: {statistics.mean(rsq_list)}") 
 print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
@@ -303,6 +322,14 @@ var_imp = pd.concat([var_imp_mean, var_imp_sd], axis=1)
 
 var_imp.to_csv(f'var_imp_kfold_DNN_{studyvar}.csv')
 
+# Dependence plots
+# The partial dependence plot shows the marginal effect 
+# one or two features have on the predicted outcome. 
+# It tells whether the relationship between the target and a feature is linear, 
+# monotonic or more complex. It automatically includes another variable that 
+# your chosen variable interacts most with.
+
+ shap.dependence_plot('re2_10', shap_values[0], train_features)
 
 ##############################################################################
 #                              Tests & notes

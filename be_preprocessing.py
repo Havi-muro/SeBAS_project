@@ -43,16 +43,16 @@ Mydataset_vars = Mydataset_0.drop([
                 #### Identification variables ####
     'x', 'y', 
     'explo', 
-    # 'yep',
+     #'yep',
      #'Year', 
      #'ep',
                     #### Study variables ####   
         'SpecRichness',
         'height_cm',
         "biomass_g",
-        #'NMDS1',
+        'NMDS1',
         'NMDS2',
-        'SpecRich_157',
+        #'SpecRich_157',
         'Rao_Q',
         'Redundancy',        
         'Shannon',
@@ -143,5 +143,5 @@ MydatasetLUI.index = np.arange(0, len(MydatasetLUI))
 Mydataset = Mydataset.drop(['Year', 'ep', 'LUI_2015_2018','yep'], axis=1)
 
 # Soil and explo are categorica variables. Change it to one-hot encoded.
-Mydataset = pd.get_dummies(Mydataset, prefix='', prefix_sep='')
+#Mydataset = pd.get_dummies(Mydataset, prefix='', prefix_sep='')
 print(Mydataset.head())
