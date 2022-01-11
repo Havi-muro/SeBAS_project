@@ -82,7 +82,7 @@ list(Mydataset_vars.columns)
 # keep variable 'explo' for spatial cross-validation
 
 # Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018', 
-#                                # 'explo',
+#                                 'explo',
 #                                 'blue',
 #                                 #'green', 
 #                                 #'red', 
@@ -92,15 +92,15 @@ list(Mydataset_vars.columns)
 #                                 're2',
 #                                 're3', 
 #                                 'swir1', 
-#                                 #'swir2'
+#                                 'swir2'
 # #                               ,'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
 
-#                                # ,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI'
-#                                #,'VHMean_May','VVMean_May','VVVH'
-#                                #,'SoilTypeFusion'
-#                                #,'slope', 'aspect'
-#                                #,'TWI'
-#                                ]]
+#                                  ,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI'
+#                                 ,'VHMean_May','VVMean_May','VVVH'
+#                                 ,'SoilTypeFusion'
+#                                 ,'slope', 'aspect'
+#                                 #,'TWI'
+#                                 ]]
 
 # nir_3 corresponds to Mid may. 
 # The differences in correlation between the orignial band and nir_3

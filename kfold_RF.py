@@ -1,10 +1,15 @@
 """
-Created on Mon Dec 14 10:08:22 2020
-@author: Janny
-This code builds a sequential deep learning model in keras. 
-Data is normalized using the preprocessing.Normalzation() function
-Ttraining and validation points are distributed following a kfold approach
-for each exploratory
+
+Created on Mon Dec 14 10:08:22 2021
+
+@author: Javier Muro 
+
+This module defines the function to run a Random Forest model using a k-fold
+approach. Data is normalized using the preprocessing.Normalzation() function.
+
+The output is a series of lists with accuracy values and predictor
+importance of each fold
+
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -29,14 +34,10 @@ from sklearn.model_selection import RepeatedKFold
 from sklearn.ensemble import RandomForestRegressor
 from tensorflow.keras.layers.experimental import preprocessing
 
-#from sklearn.utils import shuffle
-
-
 import be_preprocessing
+
 # Create an object with the result of  the preprocessing module
 Mydataset = be_preprocessing.Mydataset
-
-
 
 RMSE_test_list = []
 RRMSE_test_list = []
@@ -79,7 +80,7 @@ def kfold_RF(studyvar):
         
         #######################################################################
         # Build model
-        model = RandomForestRegressor(n_estimators=500, 
+        model = RandomForestRegressor(n_estimators=500,
                                       max_features=int(train_features.shape[1]/3))
         # model.summary()
         #######################################################################
