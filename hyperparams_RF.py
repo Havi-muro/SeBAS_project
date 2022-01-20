@@ -173,8 +173,6 @@ for train, test in kfold.split(x):
     #######################################################################################
     # Normalzation
     #######################################################################################
-    #Get statistics of the training dataset
-    #train_dataset.describe().transpose()[['mean', 'std']]
     
     #Create normalizer layer and adapt it to our data
     #with function preprocessing.Normalization()

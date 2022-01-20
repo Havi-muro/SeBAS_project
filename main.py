@@ -42,7 +42,7 @@ import be_preprocessing
 # and to relate results to other variables in the plots afterwards
 
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'SpecRich_157'
+studyvar = 'Simpson_157'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -91,10 +91,10 @@ import spcv_DNN
 # Choose which site is used for test and which one(s) for training
 EPOCHS = 300
 train_dataset = Mydataset[(Mydataset['explo']=='HAI')       
-                          | (Mydataset['explo'] == 'ALB')   # take this line out to use only 1 site for training
+                        #  | (Mydataset['explo'] == 'SCH')   # take this line out to use only 1 site for training
                           ].drop(['explo'], axis=1)
                             
-test_dataset = Mydataset[Mydataset['explo']=='SCH'].drop(['explo'], axis=1)
+test_dataset = Mydataset[Mydataset['explo']=='ALB'].drop(['explo'], axis=1)
 
 spcv_DNN.spcv_DNN(EPOCHS, train_dataset, test_dataset, studyvar)
 
@@ -181,8 +181,8 @@ test_preds2 = pd.merge(MydatasetLUI,test_preds,
                        left_index = True, 
                        right_index = True)
 
-preds_test = test_preds2[['Year', 'ep', 'SpecRich_157', 'preds']]
-preds_test.to_csv('results/preds_vs_test_SpeccRich_157_RF.csv')
+preds_test = test_preds2[['Year', 'ep', studyvar, 'preds']]
+#preds_test.to_csv('results/preds_vs_test_SpeccRich_157_RF.csv')
 
 test_preds2 = test_preds2.rename(columns = {'LUI_2015_2018':'LUI'})
 

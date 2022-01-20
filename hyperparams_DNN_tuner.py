@@ -14,25 +14,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 import pandas as pd
 
-
-#for kfolds
-import sklearn
-from sklearn.model_selection import KFold
-from sklearn import metrics
-from sklearn.model_selection import GridSearchCV
-
-from sklearn.datasets import make_regression
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedKFold
-from tensorflow.keras.layers.experimental import preprocessing
-
-
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
-from keras.wrappers.scikit_learn import KerasRegressor
 
 #from sklearn.utils import shuffle
 cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
@@ -51,40 +37,39 @@ print(Mydataset.head())
 print(list(Mydataset.columns))
 
 # define model
-def build_model(nodes):
+def build_model(hp):
   model = keras.Sequential([
     #normalizer,
-    layers.Dense(nodes, 
-                 activation='relu', 
+    layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32), 
+                 activation='relu',
                  kernel_regularizer=keras.regularizers.l1(0.01),
-                 input_shape=train_features.shape), #!!! We had to change here to get the shape from the np array
+                 input_shape=[len(train_features.keys())]), 
+                # !!! We had to change here to get the shape from the np array
+                # input_shape=[len(train_features.keys())])
        
-    layers.Dense(nodes, activation='relu',
-                 kernel_regularizer=keras.regularizers.l1(0.01),
-                 ),
-    
-    layers.Dense(nodes, activation='relu',
+    layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32), 
                   kernel_regularizer=keras.regularizers.l1(0.01),
                   ),
+    
+    # layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32), 
+    #              activation='relu',                 
+    #               kernel_regularizer=keras.regularizers.l1(0.01),
+    #               ),
     
     layers.Dense(1)
   ])
 
   #optimizer = tf.keras.optimizers.RMSprop(0.001)
 
-  model.compile(loss='mae',
-                optimizer='adam',
+  model.compile(loss=['mae'],
+                optimizer=tf.keras.optimizers.RMSprop(0.001),
                 metrics=[tf.keras.metrics.RootMeanSquaredError()])
                 #metrics=['mae','mse'])
   return model
 
 
-#Create y (labels) and x (features)
 
-train_labels = Mydataset[[studyvar]].values
-train_features = Mydataset.drop(studyvar, axis=1).values
 
-epochs=200
 
 #######################################################################################
 # Normalzation
@@ -92,11 +77,65 @@ epochs=200
 #Get statistics of the training dataset
 #train_dataset.describe().transpose()[['mean', 'std']]
 
+#Create y (labels) and x (features)
+
+# Distribution of train and test
+train_dataset = Mydataset.sample(frac=0.8,random_state=0)
+test_dataset = Mydataset.drop(train_dataset.index)
+
+train_labels = train_dataset[[studyvar]]
+train_features = train_dataset.drop(studyvar, axis=1)
+
+test_labels = test_dataset[[studyvar]]
+test_features = test_dataset.drop(studyvar, axis=1)
+
 #Create normalizer layer and adapt it to our data
 #with function preprocessing.Normalization()
 normalizer = preprocessing.Normalization()
 normalizer.adapt(np.array(train_features))
-train_features = pd.DataFrame(normalizer(train_features))
+
+from tensorflow import keras
+from tensorflow.keras import layers
+# conda install -c conda-forge keras-tuner
+import keras_tuner as kt
+
+build_model(kt.HyperParameters())
+hp = kt.HyperParameters()
+
+import os
+
+tuner = kt.Hyperband(
+    hypermodel=build_model,
+    objective=kt.Objective('root_mean_squared_error', direction='min'),
+    max_epochs=10,
+    executions_per_trial=2,
+    overwrite=True,
+    directory=os.path.normpath('C:/keras_tuner_dir'),
+    project_name='keras_tuner_demo'
+)
+
+
+# Print a summary of the search space:
+tuner.search_space_summary()
+
+# Start the grid search
+tuner.search(train_features, train_labels, epochs=10, validation_split=0.2)
+#validation_split=0.2
+#validation_data=(test_features, test_labels)
+
+
+best_model = tuner.get_best_models()[0]
+best_model.build(train_features.shape)
+best_model.summary()
+
+
+
+
+
+
+
+
+
 
 model=KerasRegressor(build_fn = build_model)
 

@@ -24,11 +24,11 @@ def build_model(normalizer, train_features):
                  kernel_regularizer=keras.regularizers.l1(0.01),
                  input_shape=train_features.shape), #!!! We had to change here to get the shape from the np array
        
-    layers.Dense(128, activation='relu',
+    layers.Dense(64, activation='relu',
                  kernel_regularizer=keras.regularizers.l1(0.01),
                  ),
     
-    layers.Dense(128, activation='relu',
+    layers.Dense(64, activation='relu',
                   kernel_regularizer=keras.regularizers.l1(0.01),
                   ),
     
