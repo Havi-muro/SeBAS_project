@@ -3,7 +3,13 @@
 Created on Mon Nov  8 17:01:52 2021
 
 This module preprocess the bexis data and selects the variable of study
-as well as predictors. It fills nans and removes identified outliers
+as well as predictors. It fills nans and removes identified outliers.
+
+Select predictors for species richness by dropping, 
+or for biomass, by slecting
+
+For spatial crossvalidation, comment second to last line so that the exploratory
+information is preserved.
 
 @author: Javier Muro
 
@@ -53,10 +59,10 @@ Mydataset_vars = Mydataset_0.drop([
           'PielouEvenness_157',        
         'SpecRichness',
         'height_cm',
-        #"biomass_g",
+        "biomass_g",
         'NMDS1',
         'NMDS2',
-        'SpecRich_157',
+        #'SpecRich_157',
         'Rao_Q_157',
         'Redundancy_157',        
         'Shannon',
@@ -67,15 +73,15 @@ Mydataset_vars = Mydataset_0.drop([
               
                          #### Predictors ####
                   #"LUI_2015_2018",
-                 "SoilTypeFusion" ,
+                 #"SoilTypeFusion" ,
                   'LAI',
-                  'slope',
-                 'aspect',
+                  #'slope',
+                  #'aspect',
                   'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
-                  'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
-                  'VHMean_May',
-                  'VVMean_May',
-                  'VVVH',
+                  #'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
+                  #'VHMean_May',
+                  #'VVMean_May',
+                  #'VVVH',
                   'TWI'
              
        ], axis=1)
@@ -85,26 +91,26 @@ list(Mydataset_vars.columns)
 # Select study variable and predictors by subsetting
 # keep variable 'explo' for spatial cross-validation
 
-Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018' 
-                                # ,'explo',
-                                ,'blue',
-                                # 'green', 
-                                # 'red', 
-                                'nir', 
-                                'nirb', 
-                                're1',
-                                're2',
-                                're3', 
-                                'swir1', 
-                                # 'swir2'
-                                #'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
+# Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018' 
+#                                 # ,'explo',
+#                                 ,'blue',
+#                                 # 'green', 
+#                                 # 'red', 
+#                                 'nir', 
+#                                 'nirb', 
+#                                 're1',
+#                                 're2',
+#                                 're3', 
+#                                 'swir1', 
+#                                 # 'swir2'
+#                                 #'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
 
-                                #,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI'
-                                #,'VHMean_May','VVMean_May','VVVH'
-                                #,'SoilTypeFusion'
-                                #,'slope', 'aspect'
-                                #,'TWI'
-                                ]]
+#                                 #,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI'
+#                                 #,'VHMean_May','VVMean_May','VVVH'
+#                                 #,'SoilTypeFusion'
+#                                 #,'slope', 'aspect'
+#                                 #,'TWI'
+#                                 ]]
 
 # nir_3 corresponds to Mid may. 
 # The differences in correlation between the orignial band and nir_3
@@ -148,5 +154,5 @@ Mydataset = Mydataset.drop(['Year', 'ep', 'LUI_2015_2018','yep'], axis=1)
 
 # Soil and explo are categorica variables. Change it to one-hot encoded.
 # Comment this line if doing spatial cross-validation.
-# Mydataset = pd.get_dummies(Mydataset, prefix='', prefix_sep='')
+Mydataset = pd.get_dummies(Mydataset, prefix='', prefix_sep='')
 print(Mydataset.head())

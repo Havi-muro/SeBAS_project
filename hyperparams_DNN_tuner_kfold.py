@@ -3,9 +3,12 @@ Created on Tue Jan 11 10:08:22 2022
 
 @author: Javier Muro
 
-This code determines the best hyperparameters to chose in a random forest model.
+This code determines the best hyperparameters to chose in a for a DNN.
 From a list of possible options, it tests all the possible combinations of
 hyperparameters and returns the best one. 
+
+Optimal hyperparameters are extracted/printed from the best model 
+of each fold
 
 """
 
@@ -38,7 +41,10 @@ import be_preprocessing
 # and to relate results to other variables in the plots afterwards
 
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'biomass_g'
+
+#studyvar = 'biomass_g'
+studyvar = 'SpecRich_157'
+
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -56,11 +62,11 @@ def build_model(hp):
     layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32), 
                   kernel_regularizer=keras.regularizers.l1(0.01),
                   ),
-    
-    # layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32), 
-    #              activation='relu',                 
-    #               kernel_regularizer=keras.regularizers.l1(0.01),
-    #               ),
+        
+    layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
+                 activation='relu',
+                  kernel_regularizer=keras.regularizers.l1(0.01),
+                  ),
     
     layers.Dense(1)
   ])
@@ -68,7 +74,7 @@ def build_model(hp):
   #optimizer = tf.keras.optimizers.RMSprop(0.001)
 
   model.compile(loss=['mae'],
-                optimizer=tf.keras.optimizers.RMSprop(0.001),
+                optimizer=hp.Choice('optimizer', values=['adam', 'adagrad', 'RMSprop']),
                 metrics=[tf.keras.metrics.RootMeanSquaredError()])
                 #metrics=['mae','mse'])
   return model
@@ -104,7 +110,7 @@ for train, test in kfold.split(x):
     tuner = kt.Hyperband(
         hypermodel=build_model,
         objective=kt.Objective('root_mean_squared_error', direction='min'),
-        max_epochs=10,
+        max_epochs=200,
         executions_per_trial=2,
         overwrite=True,
         directory=os.path.normpath(f'C:/keras_tuner_dir/Fold{fold}'),
@@ -112,10 +118,10 @@ for train, test in kfold.split(x):
     )
 
     # Print a summary of the search space:
-    #tuner.search_space_summary()
+    # tuner.search_space_summary()
 
-    # Start the grid search
-    tuner.search(train_features, train_labels, epochs=10, validation_split=0.2)
+    # Start the grid search using 20% of the training data for validation (aka dev_set)
+    tuner.search(train_features, train_labels, epochs=200, validation_split=0.2)
     #validation_split=0.2
     #validation_data=(test_features, test_labels)
 
@@ -123,10 +129,19 @@ for train, test in kfold.split(x):
     best_model = tuner.get_best_models()[0]
     best_model.build(train_features.shape)
     best_list.append(best_model)
-    tuner.results_summary()
-    print(tuner.results_summary(2))
+    #tuner.results_summary()
+    #print(tuner.results_summary(2))
 
 
+# Print the results of the best model for each fold
+print(best_list[0].summary())
+print(best_list[1].summary())
+print(best_list[2].summary())
+print(best_list[3].summary())
+print(best_list[4].summary())
 
-
-
+print(best_list[0].optimizer)
+print(best_list[1].optimizer)
+print(best_list[2].optimizer)
+print(best_list[3].optimizer)
+print(best_list[4].optimizer)

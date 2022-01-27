@@ -8,6 +8,9 @@ and runs the k-fold cross validation
 The output is a series of lists with accuracy values and predictor
 importance of each fold
 
+Predictor importance is calculated with a very basic leaf one out function
+Use the shap module for better results
+
 @author: Javier Muro
 
 """

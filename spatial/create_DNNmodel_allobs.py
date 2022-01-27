@@ -32,7 +32,7 @@ import be_preprocessing
 # We have to define this to explore the dataset we work with
 # and to relate results to other variables in the plots afterwards
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'biomass_g'
+studyvar = 'SpecRich_157'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 
@@ -77,7 +77,7 @@ plot_loss.plot_loss(history, EPOCHS, studyvar)
 # Measure RMSE using the validation (0.2%) data
 RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
 
-#model.save('spatial/test_biom_model_S2bands')
+#model.save(f'spatial/{studyvar}_model_S2bands')
 
 
 

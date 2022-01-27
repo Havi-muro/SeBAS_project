@@ -2,7 +2,7 @@
 """
 Created on Tue Jul 27 11:58:34 2021
 
-Apply biomass model to tablular data
+Apply biomass model to tablular data for predictions across time
 
 @author: rsrg_javier
 """

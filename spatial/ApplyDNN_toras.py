@@ -4,13 +4,13 @@ Created on Mon Jul 19 13:44:07 2021
 this code will apply the DNN model of biomass or spp richness
 to a raster image
 
-It takes one band of the image, copies it, and gives all the pixels value 1 for ALB, 
+Optionally it takes one band of the image, copies it, and gives all the pixels value 1 for ALB, 
 2 for HAI and 3 for SCH. this is so that the model knows which exploratory we are dealing with.
 It inserts that new band onto the raster. Model is loaded and applied to that raster.
 
-Making no data values seems to be necessary only for displaying purposes.
+Making no data values is only for visualization purposes.
 
-@author: rsrg_javier
+@author: Javier Muro
 """
 #conda install -c conda-forge earthpy
 import earthpy as et
@@ -34,7 +34,7 @@ import rasterio
 
 from glob import glob
 
-# cd C:/Users/rsrg_javier/Desktop/SEBAS/
+mydir = 'C:\\Users\\rsrg_javier\\Desktop\\SEBAS\\GIS\\RS\\ALB\\ALB2020\\'
 
 ##############################################################################################
 
@@ -68,11 +68,11 @@ from glob import glob
 #     dst.write(uno)
             
 # Import all bands in a list and stack them     
-file_list = glob("data/rs/alb*.tif")
+file_list = glob(mydir+'alb*b*.tif')
 
 # Delete the items as necessary
-#del file_list[11:13]
-#del file_list[9]
+# del file_list[11:13]
+# del file_list[9]
 
 # resorting if needed because of the band names 
 # file_list_s = [file_list[i] for i in [10, 0, 1,2,3,4,5,6,7,8,9]]
@@ -105,14 +105,14 @@ plt.show()
 
 # write the full stack
 meta.update(count = arr_st.shape[0])
-with rasterio.open('data/rs/alb_2017_test.tif', 'w', **meta, BIGTIFF='YES') as dst:
+with rasterio.open(mydir+'alb_fullstack_2020.tif', 'w', **meta, BIGTIFF='YES') as dst:
         dst.write(arr_st)
 
 ###############################################################################
 
 # Read raster with exploratory as first band in case it was used in model
 
-ds1, myrast = raster.read('data/rs/alb_2017_test.tif', bands='all')
+ds1, myrast = raster.read(mydir+'alb_fullstack_2020.tif', bands='all')
 print(np.amax(myrast))
 print(np.amin(myrast))
 
@@ -139,14 +139,14 @@ plt.show()
 myrast_reshape = changeDimension(myrast)
 
 # Read model
-model = keras.models.load_model('data/rs/BiomassModel')
+model = keras.models.load_model('C:/Users/rsrg_javier/Documents/GitHub/SeBAS_project/spatial/SpecRich_157_model_S2bands')
 
 #Apply model
 myrast_pred = model.predict(myrast_reshape)
 print(np.amax(myrast_pred))
 print(np.amin(myrast_pred))
 
-#New no data values appear. We can do it with either the max, or the mode. 
+#New no data values appear. We can remove them with either max, or mode. 
 #We might have to do it twice because of two maximums
 ep.hist(myrast_pred, figsize=(5,5))
 values, counts = np.unique(myrast_pred, return_counts=True)
@@ -170,4 +170,4 @@ ep.hist(predict_masked, figsize=(5,5))
 prediction = np.reshape(predict_masked, (ds1.RasterYSize, ds1.RasterXSize))
 plt.imshow(prediction)
 
-#raster.export(prediction, ds1, filename='data/rs/biomass_alb_2017.tif', dtype='float')
+raster.export(prediction, ds1, filename=mydir+'alb_Spprich_157_2020.tiff', dtype='float')

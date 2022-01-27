@@ -14,8 +14,8 @@ two exploratories for training and the remaining for validation.
 
 Data is normalized using the preprocessing.Normalzation() function
 
-TODO: lists created by modules do not empty when running the model a second time
-have to fix
+TODO: lists created by modules do not empty 
+when running the model a second time. Have to fix
 
 @author: Javier Muro
 """
@@ -42,7 +42,7 @@ import be_preprocessing
 # and to relate results to other variables in the plots afterwards
 
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'Simpson_157'
+studyvar = 'SpecRich_157'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -126,7 +126,8 @@ print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
 ###############################################################################
 
-# DNN
+# Very basic function to infer variable importance. Use shap instead.
+
 # list comprehension to get the first column loss
 lofo1 = [item[0] for item in LOFO_list]
 
@@ -186,6 +187,9 @@ preds_test = test_preds2[['Year', 'ep', studyvar, 'preds']]
 
 test_preds2 = test_preds2.rename(columns = {'LUI_2015_2018':'LUI'})
 
+lr = sp.stats.linregress(test_preds2['preds'], test_preds2[studyvar])
+total_rsq = lr.rvalue **2
+
 #we can use also sns.kdeplot
 myplot = sns.scatterplot(data=test_preds2,
                          y='preds',
@@ -227,12 +231,12 @@ ax.scatter(x, y, c=z, s=100)
 
 #plt.xlabel('Biomass $g/m^{2}$')
 #plt.ylabel('Predicted biomass $g/m^{2}$')
-plt.ylabel(f'Predicted {studyvar}')
-plt.xlabel(f'In situ values {studyvar}')
+plt.ylabel(f'Predicted species richness')
+plt.xlabel(f'In situ species richness')
 plt.xlim(0, max(Mydataset[studyvar]))
 plt.ylim(0, max(Mydataset[studyvar]))
 
-#plt.savefig(f'{studyvar} allfolds_densitypolot_DNN.svg')# plot without the line
+plt.savefig(f'{studyvar} allfolds_densitypolot_RF.svg')# plot without the line
 
 #add a r=1 line
 line = np.array([0,max(Mydataset[studyvar])])

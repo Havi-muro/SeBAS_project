@@ -35,10 +35,9 @@ def build_model(normalizer, train_features):
     layers.Dense(1)
   ])
 
-  optimizer = tf.keras.optimizers.RMSprop(0.001)
-
+  #optimizer = tf.keras.optimizers.RMSprop(0.001)
   model.compile(loss='mae',
-                optimizer=optimizer,
+                optimizer='adam',
                 metrics=[tf.keras.metrics.RootMeanSquaredError()])
                 #metrics=['mae','mse'])
   return model
