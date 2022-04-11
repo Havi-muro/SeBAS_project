@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import scipy as sp
 import statistics
 
@@ -20,8 +19,6 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
-
-from sklearn.utils import shuffle
 
 
 # Preprocess data
@@ -77,7 +74,7 @@ plot_loss.plot_loss(history, EPOCHS, studyvar)
 # Measure RMSE using the validation (0.2%) data
 RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
 
-#model.save(f'spatial/{studyvar}_model_S2bands')
+model.save(f'spatial/{studyvar}_adam_model_S2bands')
 
 
 

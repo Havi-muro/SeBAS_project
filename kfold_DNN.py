@@ -45,9 +45,6 @@ rsq_list = []
 
 predictions_list = []
 
-LOFO_list = []
-LOFO_Ordered_list = []
-
 def kfold_DNN(EPOCHS, studyvar):
     #Create y (labels) and x (features)
     x_columns = Mydataset.columns.drop(studyvar)
@@ -80,7 +77,7 @@ def kfold_DNN(EPOCHS, studyvar):
         ###############################################################
         #######################################################################
         model = modelDNN.build_model(normalizer, train_features)
-        #model.summary()
+        model.summary()
         #######################################################################
        
         #Train model
@@ -127,25 +124,8 @@ def kfold_DNN(EPOCHS, studyvar):
         RRMSE_test = (RMSE_test / test_mean)
         RMSE_test_list.append(RMSE_test)
         RRMSE_test_list.append(RRMSE_test)
-        
-        # Function to calculate predictors importance via leave one out
-        def LOFO(model, X, Y):
-            OneOutScore = []
-            n = X.shape[0]
-            for i in range(0,X.shape[1]):
-                newX = X.copy()
-                newX[:,i] = 0 #np.random.normal(0,1,n) #I had to change this from newX.iloc[:,i] because I am not working with pd. dataframe but with numpy arrays
-                OneOutScore.append(model.evaluate(newX, Y, verbose=0))
-            OneOutScore = pd.DataFrame(OneOutScore[:])
-            ordered = np.argsort(-OneOutScore.iloc[:,0])
-            return(OneOutScore, ordered)
-    
-        # apply on the model
-        LOFO, LOFO_Ordered = LOFO(model, train_features, train_labels)
-        LOFO_list.append(LOFO)
-        LOFO_Ordered_list.append(LOFO_Ordered)
-        
+                
     return model
           
-#if __name__ == "__main__":
-#    kfold_DNN(EPOCHS)
+if __name__ == "__main__":
+    kfold_DNN(EPOCHS, studyvar)

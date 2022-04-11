@@ -139,7 +139,7 @@ plt.show()
 myrast_reshape = changeDimension(myrast)
 
 # Read model
-model = keras.models.load_model('C:/Users/rsrg_javier/Documents/GitHub/SeBAS_project/spatial/SpecRich_157_model_S2bands')
+model = keras.models.load_model('C:/Users/rsrg_javier/Documents/GitHub/SeBAS_project/spatial/SpecRich_157_adam_model_S2bands')
 
 #Apply model
 myrast_pred = model.predict(myrast_reshape)
@@ -170,4 +170,4 @@ ep.hist(predict_masked, figsize=(5,5))
 prediction = np.reshape(predict_masked, (ds1.RasterYSize, ds1.RasterXSize))
 plt.imshow(prediction)
 
-raster.export(prediction, ds1, filename=mydir+'alb_Spprich_157_2020.tiff', dtype='float')
+raster.export(prediction, ds1, filename=mydir+'alb_Spprich_157_adam_2020.tiff', dtype='float')

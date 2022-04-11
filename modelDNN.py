@@ -12,8 +12,6 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
-# todo: this can be run without defining train_features or the normalizer 
-# because we are just defining the function but it cannot be imported
 
 # define model
 def build_model(normalizer, train_features):

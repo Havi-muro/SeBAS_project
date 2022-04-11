@@ -183,7 +183,7 @@ test_preds2 = pd.merge(MydatasetLUI,test_preds,
                        right_index = True)
 
 preds_test = test_preds2[['Year', 'ep', studyvar, 'preds']]
-#preds_test.to_csv('results/preds_vs_test_SpeccRich_157_RF.csv')
+preds_test.to_csv(f'results/preds_vs_test_{studyvar}_rf_topo_ts.csv')
 
 test_preds2 = test_preds2.rename(columns = {'LUI_2015_2018':'LUI'})
 
@@ -236,7 +236,7 @@ plt.xlabel(f'In situ species richness')
 plt.xlim(0, max(Mydataset[studyvar]))
 plt.ylim(0, max(Mydataset[studyvar]))
 
-plt.savefig(f'{studyvar} allfolds_densitypolot_RF.svg')# plot without the line
+#plt.savefig(f'{studyvar} allfolds_densitypolot_RF.svg')# plot without the line
 
 #add a r=1 line
 line = np.array([0,max(Mydataset[studyvar])])
