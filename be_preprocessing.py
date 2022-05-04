@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 # Load datasets
-Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_simspson157_Dec2021.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_April.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -57,12 +57,12 @@ Mydataset_vars = Mydataset_0.drop([
           'Simpson_157',
           'inverse_Simpson_157',
           'PielouEvenness_157',        
-        'SpecRichness',
+        #'SpecRichness',
         'height_cm',
         "biomass_g",
         'NMDS1',
         'NMDS2',
-        #'SpecRich_157',
+        'SpecRich_157',
         'Rao_Q_157',
         'Redundancy_157',        
         'Shannon',
@@ -73,27 +73,27 @@ Mydataset_vars = Mydataset_0.drop([
               
                          #### Predictors ####
                   #"LUI_2015_2018",
-                 "SoilTypeFusion" ,
-                  'LAI',
-                  'slope',
-                  'aspect',
-                  'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
-                  'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
-                  'VHMean_May',
-                  'VVMean_May',
-                  'VVVH',
+                 #"SoilTypeFusion" ,
+                  #'slope',
+                  #'aspect',
+                  #'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
+                  #'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
+                  # 'LAI',
+                  #'VHMean_May',
+                  #'VVMean_May',
+                  #'VVVH',
                   'TWI'
              
        ], axis=1)
 
 list(Mydataset_vars.columns)
 
-# Select study variable and predictors by subsetting
-# keep variable 'explo' for spatial cross-validation
+#Select study variable and predictors by subsetting
+#keep variable 'explo' for spatial cross-validation
 
-# Mydataset_vars = Mydataset_0[['Year', 'ep', 'SpecRich_157', 'yep', 'LUI_2015_2018' 
-#                                #  ,'explo',
-#                                ,'blue',
+# Mydataset_vars = Mydataset_0[['Year', 'ep', 'SpecRichness', 'yep', 'LUI_2015_2018' 
+#                                 #  ,'explo',
+#                                 ,'blue',
 #                                 'green', 
 #                                 'red', 
 #                                 'nir', 
@@ -109,7 +109,7 @@ list(Mydataset_vars.columns)
 #                                 ,'VHMean_May','VVMean_May','VVVH'
 #                                 ,'SoilTypeFusion'
 #                                 ,'slope', 'aspect'
-#                                 #,'TWI'
+#                                 ,'TWI'
 #                                 ]]
 
 # nir_3 corresponds to Mid may. 

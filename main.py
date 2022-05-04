@@ -42,7 +42,7 @@ import be_preprocessing
 # and to relate results to other variables in the plots afterwards
 
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'SpecRich_157'
+studyvar = 'SpecRichness'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -62,9 +62,6 @@ RRMSE_test_list = kfold_DNN.RRMSE_test_list
 rsq_list = kfold_DNN.rsq_list
 
 predictions_list = kfold_DNN.predictions_list
-
-#LOFO_list = kfold_DNN.LOFO_list
-#LOFO_Ordered_list = kfold_DNN.LOFO_Ordered_list
 
 ##############################################################################
 
@@ -89,9 +86,9 @@ importance_list = kfold_RF.importance_list
 import spcv_DNN
 
 # Choose which site is used for test and which one(s) for training
-EPOCHS = 300
-train_dataset = Mydataset[(Mydataset['explo']=='HAI')       
-                        #  | (Mydataset['explo'] == 'SCH')   # take this line out to use only 1 site for training
+EPOCHS = 200
+train_dataset = Mydataset[(Mydataset['explo']=='SCH')       
+                          | (Mydataset['explo'] == 'HAI')   # take this line out to use only 1 site for training
                           ].drop(['explo'], axis=1)
                             
 test_dataset = Mydataset[Mydataset['explo']=='ALB'].drop(['explo'], axis=1)
@@ -120,50 +117,6 @@ print(f"RRMSE test StDev: {statistics.stdev(RRMSE_test_list)}")
 print(f"r squared Mean: {statistics.mean(rsq_list)}") 
 print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
-###############################################################################
-
-# Variable importances
-
-###############################################################################
-
-# Very basic function to infer variable importance. Use shap instead.
-
-# list comprehension to get the first column loss
-lofo1 = [item[0] for item in LOFO_list]
-
-#transform list to df and rename variables
-lofodf = pd.DataFrame(lofo1)
-colnames = list(Mydataset.drop(studyvar, axis=1).columns)
-lofodf.columns = colnames
-
-sns.barplot(data=lofodf, 
-            capsize = 0.1,
-            errwidth=1,
-            color='green')
-plt.ylabel('loss value')
-
-# create stats to export to csv
-lofo_stats = lofodf.describe()
-lofo_statst = lofo_stats.transpose()
-# lofo_statst.to_csv(f'C:/Users/rsrg_javier/Desktop/SEBAS/python/Var_imp_DNN_{studyvar}_ALLvars.csv')
-
-###############################################################################
-
-# RF
-varimp = pd.DataFrame(importance_list)
-colnames = list(Mydataset.drop(studyvar, axis=1).columns)
-varimp.columns = colnames
-
-sns.barplot(data=varimp, 
-            capsize = 0.1,
-            errwidth=1,
-            color='green')
-plt.ylabel('loss value')
-
-# create stats to export to csv
-varimp_stats = varimp.describe()
-varimp_statst = varimp_stats.transpose()
-varimp_statst.to_csv(f'results/Var_imp_kfold_RF_{studyvar}.csv')
 
 ###############################################################################
 
@@ -183,14 +136,15 @@ test_preds2 = pd.merge(MydatasetLUI,test_preds,
                        right_index = True)
 
 preds_test = test_preds2[['Year', 'ep', studyvar, 'preds']]
-preds_test.to_csv(f'results/preds_vs_test_{studyvar}_rf_topo_ts.csv')
+#preds_test.to_csv(f'results/preds_vs_test_{studyvar}_RF_noTS.csv')
 
 test_preds2 = test_preds2.rename(columns = {'LUI_2015_2018':'LUI'})
 
+# Sanity check to see whether the total r2 is similar to the accumulated r2 for all folds
 lr = sp.stats.linregress(test_preds2['preds'], test_preds2[studyvar])
 total_rsq = lr.rvalue **2
 
-#we can use also sns.kdeplot
+# Plot predictions color coded with LUI
 myplot = sns.scatterplot(data=test_preds2,
                          y='preds',
                          x=studyvar,
@@ -205,12 +159,12 @@ plt.xlabel(f'{studyvar} insitu values')
 myplot.legend(title="LUI")
 plt.xlim(0, max(Mydataset[studyvar]))
 plt.ylim(0, max(Mydataset[studyvar]))
-#plt.savefig(f'{studyvar}allfolds_plot2.svg')# plot without the line
 
 #add a r=1 line
 line = np.array([0,max(Mydataset[studyvar])])
 plt.plot(line,line,lw=1, c="black")
 plt.show()
+#fig.savefig(f'{studyvar}allfolds_plot2.svg')
 
 ###############################################################################
 
@@ -235,10 +189,9 @@ plt.ylabel(f'Predicted species richness')
 plt.xlabel(f'In situ species richness')
 plt.xlim(0, max(Mydataset[studyvar]))
 plt.ylim(0, max(Mydataset[studyvar]))
-
-#plt.savefig(f'{studyvar} allfolds_densitypolot_RF.svg')# plot without the line
-
 #add a r=1 line
 line = np.array([0,max(Mydataset[studyvar])])
 plt.plot(line,line,lw=1, c="black")
 plt.show()
+
+#fig.savefig(f'{studyvar} allfolds_densitypolot_DNN.svg')

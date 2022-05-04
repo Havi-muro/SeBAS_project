@@ -37,7 +37,7 @@ shap.initjs()
 
 cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
 # Load datasets
-Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_Dec2021.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_April.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -67,19 +67,23 @@ Mydataset_vars = Mydataset_0.drop(['x', 'y',
     'explo', 
      'yep',
               #'Year', 'ep',
-              'SpecRichness',
+              #'SpecRichness',
               'height_cm',
               "biomass_g", 
               'Shannon',
               'Simpson',
+              'Shannon_157',
+                 'Simpson_157',
+                 'inverse_Simpson_157',
+                 'PielouEvenness_157',
+                 'Rao_Q_157',
+                 'Redundancy_157',
               'FisherAlpha',
               'PielouEvenness',
               'number_vascular_plants',
               'NMDS1',
               'NMDS2',
-              #'SpecRich_157',
-              'Rao_Q',
-              'Redundancy',
+              'SpecRich_157',
               
               "LUI_2015_2018",
               
@@ -124,7 +128,7 @@ Mydataset_vars = Mydataset_0[['Year', 'ep', 'SpecRich_157',
 # nir_3 corresponds to Mid may. 
 # The differences in correlation between the orignial band and nir_3
 # correspond to SCH, because the original is two weeks later
-studyvar = 'SpecRich_157'
+studyvar = 'SpecRichness'
 
 
 #replace nas with mean?
@@ -178,10 +182,9 @@ def build_model():
     layers.Dense(1)
   ])
 
-  optimizer = tf.keras.optimizers.RMSprop(0.001)
-
+  #optimizer = tf.keras.optimizers.RMSprop(0.001)
   model.compile(loss='mae',
-                optimizer=optimizer,
+                optimizer='adam',
                 metrics=[tf.keras.metrics.RootMeanSquaredError()])
                 #metrics=['mae','mse'])
   return model
@@ -320,7 +323,7 @@ var_imp_sd = var_imp_df.std(axis=1)
 
 var_imp = pd.concat([var_imp_mean, var_imp_sd], axis=1)
 
-var_imp.to_csv(f'var_imp_kfold_DNN_{studyvar}.csv')
+var_imp.to_csv(f'var_imp_kfold_DNN_{studyvar}_May2022.csv')
 
 # Dependence plots
 # The partial dependence plot shows the marginal effect 
