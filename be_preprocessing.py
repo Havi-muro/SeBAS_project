@@ -73,43 +73,47 @@ Mydataset_vars = Mydataset_0.drop([
               
                          #### Predictors ####
                   #"LUI_2015_2018",
-                 #"SoilTypeFusion" ,
-                  #'slope',
-                  #'aspect',
-                  #'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
-                  #'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
-                  # 'LAI',
-                  #'VHMean_May',
-                  #'VVMean_May',
-                  #'VVVH',
+                 "SoilTypeFusion" ,
+                  'slope',
+                  'aspect',
+                  #'S2Q',
+                  'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
+                  'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
+                   'LAI',
+                  'VHMean_May',
+                  'VVMean_May',
+                  'VVVH',
                   'TWI'
              
        ], axis=1)
+
+# Remove all columns taht start with 
+Mydataset_vars= Mydataset_vars.loc[:,~Mydataset_vars.columns.str.startswith('re3')]
 
 list(Mydataset_vars.columns)
 
 #Select study variable and predictors by subsetting
 #keep variable 'explo' for spatial cross-validation
 
-# Mydataset_vars = Mydataset_0[['Year', 'ep', 'SpecRichness', 'yep', 'LUI_2015_2018' 
+# Mydataset_vars = Mydataset_0[['Year', 'ep', 'height_cm', 'yep', 'LUI_2015_2018' ,
 #                                 #  ,'explo',
-#                                 ,'blue',
-#                                 'green', 
-#                                 'red', 
+#                                 #,'blue',
+#                                 #'green', 
+#                                 #'red', 
 #                                 'nir', 
 #                                 'nirb', 
 #                                 're1',
-#                                 're2',
-#                                 're3', 
-#                                 'swir1', 
-#                                 'swir2'
+#                                 're2'
+#                                 #'re3', 
+#                                 #'swir1', 
+#                                 #'swir2'
 #                                 #'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
-
-#                                 ,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI'
-#                                 ,'VHMean_May','VVMean_May','VVVH'
-#                                 ,'SoilTypeFusion'
-#                                 ,'slope', 'aspect'
-#                                 ,'TWI'
+#                                 # 'S2Q',
+#                                 #,'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI'
+#                                 #,'VHMean_May','VVMean_May','VVVH'
+#                                 #,'SoilTypeFusion'
+#                                 #,'slope', 'aspect'
+#                                 #,'TWI'
 #                                 ]]
 
 # nir_3 corresponds to Mid may. 

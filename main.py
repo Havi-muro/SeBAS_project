@@ -136,7 +136,7 @@ test_preds2 = pd.merge(MydatasetLUI,test_preds,
                        right_index = True)
 
 preds_test = test_preds2[['Year', 'ep', studyvar, 'preds']]
-#preds_test.to_csv(f'results/preds_vs_test_{studyvar}_RF_noTS.csv')
+#preds_test.to_csv(f'results/preds_vs_test_{studyvar}_RF_S2ts_nor3.csv')
 
 test_preds2 = test_preds2.rename(columns = {'LUI_2015_2018':'LUI'})
 
@@ -185,8 +185,8 @@ ax.scatter(x, y, c=z, s=100)
 
 #plt.xlabel('Biomass $g/m^{2}$')
 #plt.ylabel('Predicted biomass $g/m^{2}$')
-plt.ylabel(f'Predicted species richness')
-plt.xlabel(f'In situ species richness')
+plt.ylabel(f'Predicted plant height')
+plt.xlabel(f'In situ plant height')
 plt.xlim(0, max(Mydataset[studyvar]))
 plt.ylim(0, max(Mydataset[studyvar]))
 #add a r=1 line
@@ -194,4 +194,4 @@ line = np.array([0,max(Mydataset[studyvar])])
 plt.plot(line,line,lw=1, c="black")
 plt.show()
 
-#fig.savefig(f'{studyvar} allfolds_densitypolot_DNN.svg')
+fig.savefig(f'results/{studyvar} allfolds_densitypolot_DNN.svg')
