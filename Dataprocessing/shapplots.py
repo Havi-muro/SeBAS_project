@@ -2,6 +2,9 @@
 """
 Created on Tue May  3 17:19:59 2022
 
+This code aggregares the variable imortances from Shap by band or by date
+and plots the results
+
 @author: rsrg_javier
 """
 cd C:\Users\rsrg_javier\Desktop\SEBAS\Manuscripts\2022\May2022

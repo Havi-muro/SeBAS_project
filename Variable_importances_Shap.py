@@ -1,11 +1,13 @@
 """
 Created on Mon Dec 14 10:08:22 2020
 @author: Janny
-This code is a little but trickier. It is a stand-alone script, meaning that
+This code is a little bit trickier. It is a stand-alone script, meaning that
 it doesn't need our other modules. It uses a slightly different normalization,
 which is not included in the model structure.
 
-It gives you the variable importance of each feature in fold
+It gives you the variable importance of each feature in fold using shapley values
+With the code shapplots.py we can aggregate the importances by band or by date 
+and plot the results
 
 """
 
@@ -37,7 +39,7 @@ shap.initjs()
 
 cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
 # Load datasets
-Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_April.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_S2Q_May.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -87,7 +89,8 @@ Mydataset_vars = Mydataset_0.drop(['x', 'y',
               
               "LUI_2015_2018",
               
-              "SoilTypeFusion" ,
+              "SoilTypeFusion",
+              #'S2Q',
               'LAI',
               'slope',
               'aspect',
@@ -323,7 +326,7 @@ var_imp_sd = var_imp_df.std(axis=1)
 
 var_imp = pd.concat([var_imp_mean, var_imp_sd], axis=1)
 
-var_imp.to_csv(f'var_imp_kfold_DNN_{studyvar}_May2022.csv')
+var_imp.to_csv(f'results/var_imp_kfold_DNN_{studyvar}_S2Q_May2022.csv')
 
 # Dependence plots
 # The partial dependence plot shows the marginal effect 
@@ -332,7 +335,7 @@ var_imp.to_csv(f'var_imp_kfold_DNN_{studyvar}_May2022.csv')
 # monotonic or more complex. It automatically includes another variable that 
 # your chosen variable interacts most with.
 
- shap.dependence_plot('re2_10', shap_values[0], train_features)
+shap.dependence_plot('S2Q', shap_values[0], train_features)
 
 ##############################################################################
 #                              Tests & notes
