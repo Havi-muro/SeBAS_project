@@ -37,6 +37,10 @@ import statistics
 # in be_preprocessing.py, select the study variable and the predictors
 import be_preprocessing
 
+# show fewer decimals at print
+pd.options.display.float_format = '{:.1f}'.format
+
+
 # Create an object with the result of  the preprocessing module
 # We have to define this to explore the dataset we work with
 # and to relate results to other variables in the plots afterwards
@@ -52,7 +56,7 @@ print(list(Mydataset.columns))
 # 1.- K-fold with DNN
 import kfold_DNN
 
-EPOCHS = 200 
+EPOCHS = 500
 
 kfold_DNN.kfold_DNN(EPOCHS, studyvar)
 
@@ -61,7 +65,10 @@ RMSE_test_list = kfold_DNN.RMSE_test_list
 RRMSE_test_list = kfold_DNN.RRMSE_test_list
 rsq_list = kfold_DNN.rsq_list
 
-predictions_list = kfold_DNN.predictions_list
+# We build a df of the accumulated predictions vs labels
+pred_trues = kfold_DNN.pred_trues
+pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
+pred_truesdf.columns = ['labels','preds']
 
 ##############################################################################
 
@@ -119,33 +126,48 @@ print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
 
 ###############################################################################
-
 # Plots
+###############################################################################
+
+#Make a density plot
+from scipy.stats import gaussian_kde
+
+y = pred_truesdf['preds']
+x = pred_truesdf['labels']
+
+# Calculate the point density
+xy = np.vstack([x,y])
+z = gaussian_kde(xy)(xy)
+
+fig, ax = plt.subplots()
+ax.scatter(x, y, c=z, s=100)
+
+#plt.xlabel('Biomass $(g/m^{2})$')
+#plt.ylabel('Predicted biomass $(g/m^{2})$')
+plt.ylabel(f'Predicted plant height')
+plt.xlabel(f'In situ plant height')
+plt.xlim(0, max(Mydataset[studyvar]))
+plt.ylim(0, max(Mydataset[studyvar]))
+#add a r=1 line
+line = np.array([0,max(Mydataset[studyvar])])
+plt.plot(line,line,lw=1, c="black")
+plt.show()
+
+#fig.savefig(f'results/{studyvar} allfolds_densitypolot_DNN.svg')
 
 ###############################################################################
 
-# Plot predictions vs labels for all folds
-# Create a new column with the results of the predictions in the test_dataset
-test_preds = pd.DataFrame(predictions_list)
-test_preds.columns = ['preds']
-  
 # Merge the predicted results with the original dataset
-test_preds2 = pd.merge(MydatasetLUI,test_preds, 
+LUI_pred_vs_trues = pd.merge(MydatasetLUI,pred_truesdf, 
                        how = 'right',
                        left_index = True, 
                        right_index = True)
 
-preds_test = test_preds2[['Year', 'ep', studyvar, 'preds']]
-#preds_test.to_csv(f'results/preds_vs_test_{studyvar}_RF_S2ts_nor3.csv')
+LUI_pred_vs_trues = LUI_pred_vs_trues.rename(columns = {'LUI_2015_2018':'LUI'})
 
-test_preds2 = test_preds2.rename(columns = {'LUI_2015_2018':'LUI'})
-
-# Sanity check to see whether the total r2 is similar to the accumulated r2 for all folds
-lr = sp.stats.linregress(test_preds2['preds'], test_preds2[studyvar])
-total_rsq = lr.rvalue **2
 
 # Plot predictions color coded with LUI
-myplot = sns.scatterplot(data=test_preds2,
+myplot = sns.scatterplot(data=LUI_pred_vs_trues,
                          y='preds',
                          x=studyvar,
                          hue = 'LUI', 
@@ -167,31 +189,73 @@ plt.show()
 #fig.savefig(f'{studyvar}allfolds_plot2.svg')
 
 ###############################################################################
-
+# more error metrics
 ###############################################################################
 
-#Make a density plot
-from scipy.stats import gaussian_kde
+"""
+% Matlab function to calculate model evaluation statistics 
+% S. Robeson, November 1993
+%
+% y(1):  mean of observed variable 
+% y(2):  mean of predicted variable 
+% y(3):  std dev of observed variable 
+% y(4):  std dev of predicted variable 
+% y(5):  correlation coefficient
+% y(6):  intercept of OLS regression
+% y(7):  slope of OLS regression
+% y(8):  mean absolute error (MAE)
+% y(9):  index of agreement (based on MAE)
+% y(10): root mean squared error (RMSE)
+% y(11): RMSE, systematic component
+% y(12): RMSE, unsystematic component
+% y(13): index of agreement (based on RMSE)
 
-y = test_preds2['preds']
-x = test_preds2[studyvar]
+""" 
 
-# Calculate the point density
-xy = np.vstack([x,y])
-z = gaussian_kde(xy)(xy)
 
-fig, ax = plt.subplots()
-ax.scatter(x, y, c=z, s=100)
+n = len(pred_truesdf['labels'])
+so = pred_truesdf['labels'].sum()
+sp = pred_truesdf['preds'].sum()
 
-#plt.xlabel('Biomass $g/m^{2}$')
-#plt.ylabel('Predicted biomass $g/m^{2}$')
-plt.ylabel(f'Predicted plant height')
-plt.xlabel(f'In situ plant height')
-plt.xlim(0, max(Mydataset[studyvar]))
-plt.ylim(0, max(Mydataset[studyvar]))
-#add a r=1 line
-line = np.array([0,max(Mydataset[studyvar])])
-plt.plot(line,line,lw=1, c="black")
-plt.show()
+sumo2 = (pred_truesdf['labels']**2).sum()
+sump2 = (pred_truesdf['preds']**2).sum()
 
-fig.savefig(f'results/{studyvar} allfolds_densitypolot_DNN.svg')
+sum2 = ((pred_truesdf['labels']-pred_truesdf['preds'])**2).sum()
+sumabs = abs(pred_truesdf['labels']-pred_truesdf['preds']).sum()
+
+sumdif = (pred_truesdf['labels']-pred_truesdf['preds']).sum()
+cross = (pred_truesdf['labels']*pred_truesdf['preds']).sum()
+
+obar = pred_truesdf['labels'].mean()
+pbar = pred_truesdf['preds'].mean()
+
+import math
+sdo = math.sqrt(sumo2/n - obar*obar)
+sdp = math.sqrt(sump2/n-pbar*pbar)
+c = cross/n - obar*pbar
+r = c/(sdo*sdp)
+r2 = r**2
+b = r*sdp/sdo
+a = pbar - b*obar
+mse = sum2/n
+mae = sumabs/n
+
+msea = a**2
+msei = 2*a*(b-1)*obar
+msep = ((b-1)**2) *sumo2/n
+mses = msea + msei + msep
+mseu = mse - mses
+
+rmse = math.sqrt(mse)
+rmses = math.sqrt(mses)
+rmseu = math.sqrt(mseu)
+
+
+pe1 = (abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar)).sum()
+pe2 = ((abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar))**2).sum()
+d1 = 1 - n*mae/pe1;
+d2 = 1 - n*mse/pe2;
+
+y = [obar,pbar,sdo,sdp,r,a,b,mae,d1,rmse,rmses,rmseu,d2]   
+
+# pred_truesdf.to_csv('results/testa.csv')  

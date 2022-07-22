@@ -6,7 +6,7 @@ This module preprocess the bexis data and selects the variable of study
 as well as predictors. It fills nans and removes identified outliers.
 
 Select predictors for species richness by dropping, 
-or for biomass, by slecting
+or for biomass, by extracting [[]]
 
 For spatial crossvalidation, comment second to last line so that the exploratory
 information is preserved.
@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 # Load datasets
-Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_April.csv')
+Mydataset_0 = pd.read_csv ('data/Bexis_S1S2_height_NMDS_RaoQ_S2Q_May_forest.csv')
 
 # The year and the ep have been concatenated to sort the observations by
 # Exoloratory, plot number and year so that: 
@@ -76,10 +76,10 @@ Mydataset_vars = Mydataset_0.drop([
                  "SoilTypeFusion" ,
                   'slope',
                   'aspect',
-                  #'S2Q',
+                  'S2Q', 'S2QF',
                   'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
                   'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
-                   'LAI',
+                  'LAI',
                   'VHMean_May',
                   'VVMean_May',
                   'VVVH',
@@ -87,8 +87,8 @@ Mydataset_vars = Mydataset_0.drop([
              
        ], axis=1)
 
-# Remove all columns taht start with 
-Mydataset_vars= Mydataset_vars.loc[:,~Mydataset_vars.columns.str.startswith('re3')]
+# Remove all columns that start with 
+#Mydataset_vars= Mydataset_vars.loc[:,~Mydataset_vars.columns.str.startswith('re3')]
 
 list(Mydataset_vars.columns)
 

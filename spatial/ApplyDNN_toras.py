@@ -30,18 +30,29 @@ import os
 import pyrsgis
 from pyrsgis import raster
 from pyrsgis.convert import changeDimension
-import rasterio
+
+import geopandas as gpd
+import rioxarray as rxr
+import rasterio as rio
+from shapely.geometry import mapping
 
 from glob import glob
 
-mydir = 'C:\\Users\\rsrg_javier\\Desktop\\SEBAS\\GIS\\RS\\ALB\\ALB2020\\'
+explo = 'hai'
+
+#mydir = 'C:\\Users\\rsrg_javier\\Desktop\\SEBAS\\GIS\\RS\\ALB\\ALB2020\\'
+#mydir = f'D:\SeBAS_RS\RS\{explo}\ALB2020\\'
+
+
+# open with os so that shashes and capitals don't matter
+os.chdir(os.path.join('D:/','SeBAS_RS','RS',explo,f'{explo}2020'))
 
 ##############################################################################################
 
 # This part is to get a raster with value 1 for Alb, 2 for Hai and 3 for Sch 
 # so that the model knows which site we are working on
 # Open one band with rasterio
-#myimg = rasterio.open('C:/Users/rsrg_javier/Desktop/SEBAS/GIS/RS/HAI/hai_20200524_b01.tif')
+#myimg = rio.open('C:/Users/rsrg_javier/Desktop/SEBAS/GIS/RS/HAI/hai_20200524_b01.tif')
 #read it
 #fullimg = myimg.read()
 
@@ -54,9 +65,9 @@ mydir = 'C:\\Users\\rsrg_javier\\Desktop\\SEBAS\\GIS\\RS\\ALB\\ALB2020\\'
 #type(uno)
 
 # Write raster. We have to specify the metadata from our original image
-# from rasterio.transform import from_origin
-# from rasterio.crs import CRS
-# with rasterio.open('ALB_bValue1nop.tif', 'w', 
+# from rio.transform import from_origin
+# from rio.crs import CRS
+# with rio.open('ALB_bValue1nop.tif', 'w', 
 #                    driver = "Gtiff",
 #                    height= fullimg.shape[1],
 #                    width= fullimg.shape[2],
@@ -68,7 +79,11 @@ mydir = 'C:\\Users\\rsrg_javier\\Desktop\\SEBAS\\GIS\\RS\\ALB\\ALB2020\\'
 #     dst.write(uno)
             
 # Import all bands in a list and stack them     
-file_list = glob(mydir+'alb*b*.tif')
+file_list = glob(f'{explo}*_b*.tif')
+
+# In case we need to remove some band
+#file_list = [i for i in file_list if not i.endswith('b06.tif')]
+
 
 # Delete the items as necessary
 # del file_list[11:13]
@@ -105,14 +120,16 @@ plt.show()
 
 # write the full stack
 meta.update(count = arr_st.shape[0])
-with rasterio.open(mydir+'alb_fullstack_2020.tif', 'w', **meta, BIGTIFF='YES') as dst:
+with rio.open(+f'{explo}_fullstack_2017_20july.tif', 'w', **meta, BIGTIFF='YES') as dst:
         dst.write(arr_st)
 
 ###############################################################################
 
-# Read raster with exploratory as first band in case it was used in model
+# Read raster
+ds1, myrast = raster.read(f'{explo}_fullstack_2017_20july.tif', bands='all')
 
-ds1, myrast = raster.read(mydir+'alb_fullstack_2020.tif', bands='all')
+ep.plot_bands(myrast[0])
+ep.hist(myrast[0])
 print(np.amax(myrast))
 print(np.amin(myrast))
 
@@ -124,7 +141,7 @@ print(np.amax(myrast_masked))
 print(np.amin(myrast_masked))
 
 
-#Plot raster and histgram
+# Plot raster and histgram
 fig, ax = plt.subplots(figsize=(12, 12))
 
 ep.plot_rgb(myrast_masked, rgb=(3, 2, 1), ax=ax, title="Sentinel-2 NIR-G-R")
@@ -134,12 +151,12 @@ ep.hist(myrast_masked)
 plt.show()
 ###############################################################################
 
-#Change raster dymensions. 
+#Change raster dimensions. 
 #No need to normalize, since the model performs normalization
 myrast_reshape = changeDimension(myrast)
 
 # Read model
-model = keras.models.load_model('C:/Users/rsrg_javier/Documents/GitHub/SeBAS_project/spatial/SpecRich_157_adam_model_S2bands')
+model = keras.models.load_model('C:/Users/rsrg_javier/Documents/GitHub/SeBAS_project/spatial/SpecRichness_adam_model_S2bands_20July')
 
 #Apply model
 myrast_pred = model.predict(myrast_reshape)
@@ -168,6 +185,30 @@ ep.hist(predict_masked, figsize=(5,5))
 
 # Reshape the raster according to the original dimensions
 prediction = np.reshape(predict_masked, (ds1.RasterYSize, ds1.RasterXSize))
-plt.imshow(prediction)
 
-raster.export(prediction, ds1, filename=mydir+'alb_Spprich_157_adam_2020.tiff', dtype='float')
+
+# set path to mask and open it
+aoi = os.path.join(f'{explo}_grass_aoa_2020.shp')
+extent = gpd.read_file(aoi)
+extent.crs
+
+# clip
+sppcl = prediction.rio.clip(extent.geometry.apply(mapping, extent.crs)) # This is needed if your GDF is in a diff CRS than the raster data
+
+plt.imshow(sppcl)
+ep.hist(sppcl)
+
+raster.export(sppcl, ds1, filename=f'{explo}_Spprich_adam_2020_20july.tiff', dtype='float')
+
+##############################################################################
+
+
+
+
+
+
+
+
+
+
+

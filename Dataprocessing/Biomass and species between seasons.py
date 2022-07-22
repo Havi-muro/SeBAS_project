@@ -4,7 +4,7 @@ Created on Mon May 16 10:46:16 2022
 
 @author: rsrg_javier
 
-This script joins species and biomass data
+This script joins species and biomass data from SeBAS campaigns
 
 It also divides the dataframe by campaign. 
 This is done to compare variations in biomass and species between seasons

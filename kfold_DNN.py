@@ -24,6 +24,7 @@ import pandas as pd
 import scipy as sp
 import tensorflow as tf
 from tensorflow import keras
+from keras.callbacks import EarlyStopping
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
@@ -44,6 +45,9 @@ RMSE_val_list = []
 rsq_list = []
 
 predictions_list = []
+pred_trues = []
+
+
 
 def kfold_DNN(EPOCHS, studyvar):
     #Create y (labels) and x (features)
@@ -79,7 +83,10 @@ def kfold_DNN(EPOCHS, studyvar):
         model = modelDNN.build_model(normalizer, train_features)
         model.summary()
         #######################################################################
-       
+        
+        #Add an early stopping to avoid overfitting
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50)
+        
         #Train model
         #Keras fit function expects training features to be as array.
         history = model.fit(
@@ -87,7 +94,8 @@ def kfold_DNN(EPOCHS, studyvar):
             train_labels, 
             epochs=EPOCHS, 
             validation_split = 0.2, 
-            verbose=0)
+            verbose=0
+            ,callbacks=[es])
             
         #######################################################################
         #Plot errors
@@ -99,12 +107,15 @@ def kfold_DNN(EPOCHS, studyvar):
         
         # Measure this fold's RMSE using the validation (0.2%) data
         RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
-        #print(f"RMSE validation data: {RMSE_val}")
+        print(f"RMSE validation data: {RMSE_val}")
         
         #Predictions
         #Make predictions on the test data using the model, and stored results of each fold
         test_predictions = model.predict(test_features).flatten()
-        predictions_list.extend(test_predictions)
+        #predictions_list.extend(test_predictions)
+        
+        c = pd.concat([pd.Series(test_labels), pd.Series(test_predictions)], axis=1)
+        pred_trues.append(c)
         
         # Measure this fold's RMSE using the test data
         RMSE_test = np.sqrt(metrics.mean_squared_error(test_predictions,test_labels))

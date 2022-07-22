@@ -43,7 +43,7 @@ import be_preprocessing
 Mydataset = be_preprocessing.Mydataset
 
 #studyvar = 'biomass_g'
-studyvar = 'SpecRich_157'
+studyvar = 'SpecRichness'
 
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
@@ -58,16 +58,22 @@ def build_model(hp):
                  kernel_regularizer=keras.regularizers.l1(0.01),
                 # input_shape=[len(train_features.keys())]),
                  input_shape=train_features.shape),
+    
+    #layers.Dropout(hp.Float('dropout', 0.1, 0.5, step=0.1, default=0.5)),
        
     layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32), 
                   kernel_regularizer=keras.regularizers.l1(0.01),
                   ),
+    
+    #layers.Dropout(hp.Float('dropout', 0.1, 0.5, step=0.1, default=0.5)),
+
         
     layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
                  activation='relu',
                   kernel_regularizer=keras.regularizers.l1(0.01),
                   ),
-    
+    #layers.Dropout(hp.Float('dropout', 0.1, 0.5, step=0.1, default=0.5)),
+
     layers.Dense(1)
   ])
 
@@ -110,7 +116,7 @@ for train, test in kfold.split(x):
     tuner = kt.Hyperband(
         hypermodel=build_model,
         objective=kt.Objective('root_mean_squared_error', direction='min'),
-        max_epochs=200,
+        max_epochs=500,
         executions_per_trial=2,
         overwrite=True,
         directory=os.path.normpath(f'C:/keras_tuner_dir/Fold{fold}'),
@@ -121,7 +127,7 @@ for train, test in kfold.split(x):
     # tuner.search_space_summary()
 
     # Start the grid search using 20% of the training data for validation (aka dev_set)
-    tuner.search(train_features, train_labels, epochs=200, validation_split=0.2)
+    tuner.search(train_features, train_labels, epochs=500, validation_split=0.2)
     #validation_split=0.2
     #validation_data=(test_features, test_labels)
 

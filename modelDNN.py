@@ -17,18 +17,25 @@ from tensorflow.keras.layers.experimental import preprocessing
 def build_model(normalizer, train_features):
   model = keras.Sequential([
     normalizer,
-    layers.Dense(64, 
+    layers.Dense(32, 
                  activation='relu', 
                  kernel_regularizer=keras.regularizers.l1(0.01),
-                 input_shape=train_features.shape), #!!! We had to change here to get the shape from the np array
-       
-    layers.Dense(64, activation='relu',
+                 input_shape=train_features.shape),#!!! We had to change here to get the shape from the np array
+   
+    #layers.Dropout(0.2),
+        
+    layers.Dense(32, activation='relu',
                  kernel_regularizer=keras.regularizers.l1(0.01),
                  ),
     
-    layers.Dense(64, activation='relu',
+    #layers.Dropout(0.2),
+
+    layers.Dense(32, activation='relu',
                   kernel_regularizer=keras.regularizers.l1(0.01),
                   ),
+    
+    #layers.Dropout(0.2),
+
     
     layers.Dense(1)
   ])

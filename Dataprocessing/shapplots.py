@@ -7,7 +7,7 @@ and plots the results
 
 @author: rsrg_javier
 """
-cd C:\Users\rsrg_javier\Desktop\SEBAS\Manuscripts\2022\May2022
+cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project\Dataprocessing
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -60,9 +60,10 @@ bybandm = keys.merge(byband, on='band').set_index('band')
 # x is a sequence of scalars representing the x coordinates of the bars
 fig = plt.figure(figsize=(10,5))
 plt.bar(range(len(bybandm['bandt'])), bybandm['shap'], yerr=bybandm['std'], color='cadetblue')
-plt.xticks(range(len(bybandm['shap'])), bybandm['bandt'],rotation=30, size=15)
-plt.yticks(fontsize=15)
-plt.title('Shap values by band',size=15)
+plt.xticks(range(len(bybandm['shap'])), bybandm['bandt'],rotation=30, size=20)
+plt.yticks(fontsize=20)
+plt.title('by band',size=20)
+plt.ylabel('Shap values', size=20)
 plt.show()
 fig.savefig('shap_spprich_bands.svg', format='svg')
 
@@ -76,7 +77,7 @@ dfs = dfs[dfs.band != 'blue']
 dfs = dfs[dfs.band != 'red']
 dfs = dfs[dfs.band != 'green']
 
-bydate = pd.pivot_table(dfs, values=['shap', 'std', 'date'], 
+bydate = pd.pivot_table(df, values=['shap', 'std', 'date'], 
                         index='step', 
                         aggfunc ={'shap':'mean', 'std':'mean', 'date':'first'}).reset_index()
 
@@ -89,9 +90,11 @@ bydate=bydate.sort_values('step').set_index('step')
 fig = plt.figure(figsize=(10,5))
 
 plt.bar(range(len(bydate['date'])), bydate['shap'], yerr=bydate['std'], color='mediumseagreen')
-plt.xticks(range(len(bydate['shap'])), bydate['date'],rotation=30, size=12)
-plt.yticks(size=15)
-plt.title('Shap values by date', size=15)
+plt.xticks(range(len(bydate['shap'])), bydate['date'],rotation=75, size=20)
+plt.yticks(size=20)
+plt.title('by date', size=20)
+plt.ylabel('Shap values', size=20)
+
 plt.show()
 # Export to vector
 fig.savefig('shap_spprich_date.svg', format='svg')
@@ -103,18 +106,20 @@ fig.savefig('shap_spprich_date.svg', format='svg')
 
 df = pd.read_csv('Biomass_shap.csv')
 
-fig = plt.figure(figsize=(18,5))
+fig = plt.figure(figsize=(15,5))
 plt.bar(range(len(df['shap'])), 
         df['shap'], 
         yerr=df['std'], 
         align='center',
         color='teal'
         )
-plt.xticks(range(len(df['shap'])), df['Predictor'],rotation=50, size=15)
-plt.yticks(fontsize=15)
-plt.title('Shap values', size=15)
+plt.xticks(range(len(df['shap'])), df['Predictor'],rotation=75, size=20)
+plt.yticks(fontsize=20)
+plt.title('All predictors', size=20)
+plt.ylabel('Shap values', size=20)
+
 plt.show()
-fig.savefig('shap_biomass_bands.svg', format='svg')
+fig.savefig('shap_biomass_predictors.svg', format='svg')
 
 # chart by bands
 
@@ -132,16 +137,18 @@ df = df[(df.Predictor == 'blue') |
 keys = pd.DataFrame({'Predictor':['blue','green','red','re1','re2','re3','nir','nirb','swir1','swir2']})
 dfm = keys.merge(df, on='Predictor').set_index('Predictor')
 
-fig = plt.figure(figsize=(18,5))
+fig = plt.figure(figsize=(15,5))
 plt.bar(range(len(df['shap'])), 
         df['shap'], 
         yerr=df['std'], 
         align='center',
         color='sienna'
         )
-plt.xticks(range(len(df['shap'])), df['Predictor'],rotation=50, size=15)
-plt.yticks(fontsize=15)
-plt.title('Shap values', size=15)
+plt.xticks(range(len(df['shap'])), df['Predictor'],rotation=50, size=20)
+plt.yticks(fontsize=20)
+plt.title('S2 bands', size=20)
+plt.ylabel('Shap values', size=20)
+
 plt.show()
 fig.savefig('shap_biomass_bands.svg', format='svg')
 
