@@ -47,8 +47,6 @@ rsq_list = []
 predictions_list = []
 pred_trues = []
 
-
-
 def kfold_DNN(EPOCHS, studyvar):
     #Create y (labels) and x (features)
     x_columns = Mydataset.columns.drop(studyvar)
@@ -81,7 +79,7 @@ def kfold_DNN(EPOCHS, studyvar):
         ###############################################################
         #######################################################################
         model = modelDNN.build_model(normalizer, train_features)
-        model.summary()
+        #model.summary()
         #######################################################################
         
         #Add an early stopping to avoid overfitting
@@ -95,7 +93,8 @@ def kfold_DNN(EPOCHS, studyvar):
             epochs=EPOCHS, 
             validation_split = 0.2, 
             verbose=0
-            ,callbacks=[es])
+            ,callbacks=[es]
+            )
             
         #######################################################################
         #Plot errors
@@ -106,8 +105,8 @@ def kfold_DNN(EPOCHS, studyvar):
         plot_loss(history, EPOCHS, studyvar)
         
         # Measure this fold's RMSE using the validation (0.2%) data
-        RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
-        print(f"RMSE validation data: {RMSE_val}")
+        #RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].squeeze()
+        #print(f"RMSE validation data: {RMSE_val}")
         
         #Predictions
         #Make predictions on the test data using the model, and stored results of each fold
@@ -118,23 +117,23 @@ def kfold_DNN(EPOCHS, studyvar):
         pred_trues.append(c)
         
         # Measure this fold's RMSE using the test data
-        RMSE_test = np.sqrt(metrics.mean_squared_error(test_predictions,test_labels))
+        #RMSE_test = np.sqrt(metrics.mean_squared_error(test_predictions,test_labels))
         #print(f"RMSE test data: {RMSE_test}")
         
         # Calculate r2 between predicted and test data
-        linreg = sp.stats.linregress(test_predictions, test_labels)
-        rsq = linreg.rvalue **2
+        #linreg = sp.stats.linregress(test_predictions, test_labels)
+        #rsq = linreg.rvalue **2
         #rsq = metrics.r2_score(test_predictions, test_labels)
 
-        rsq_list.append(rsq)
+        #rsq_list.append(rsq)
         # p = linreg.pvalue
         # p_list.append(p)
             
         #Calculate the relative root mean squared error
-        test_mean = np.mean(test_labels)
-        RRMSE_test = (RMSE_test / test_mean)
-        RMSE_test_list.append(RMSE_test)
-        RRMSE_test_list.append(RRMSE_test)
+        #test_mean = np.mean(test_labels)
+        #RRMSE_test = (RMSE_test / test_mean)
+        #RMSE_test_list.append(RMSE_test)
+        #RRMSE_test_list.append(RRMSE_test)
                 
     return model
           

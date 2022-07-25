@@ -20,5 +20,5 @@ def plot_loss(history, EPOCHS, studyvar):
   plt.xlim([0,EPOCHS])
   plt.xlabel('Epoch')
   plt.ylabel(f'Error {studyvar}')
-  plt.legend()
+  #plt.legend()
   plt.grid(True)

@@ -32,21 +32,20 @@ import pandas as pd
 import seaborn as sns
 import scipy as sp
 import statistics
+import math
+
+from scipy.stats import gaussian_kde
 
 # Preprocess data
 # in be_preprocessing.py, select the study variable and the predictors
 import be_preprocessing
-
-# show fewer decimals at print
-pd.options.display.float_format = '{:.1f}'.format
-
 
 # Create an object with the result of  the preprocessing module
 # We have to define this to explore the dataset we work with
 # and to relate results to other variables in the plots afterwards
 
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'SpecRichness'
+studyvar = 'biomass_g'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -61,9 +60,9 @@ EPOCHS = 500
 kfold_DNN.kfold_DNN(EPOCHS, studyvar)
 
 #Put results as variables in global environment
-RMSE_test_list = kfold_DNN.RMSE_test_list
-RRMSE_test_list = kfold_DNN.RRMSE_test_list
-rsq_list = kfold_DNN.rsq_list
+#RMSE_test_list = kfold_DNN.RMSE_test_list
+#RRMSE_test_list = kfold_DNN.RRMSE_test_list
+#rsq_list = kfold_DNN.rsq_list
 
 # We build a df of the accumulated predictions vs labels
 pred_trues = kfold_DNN.pred_trues
@@ -130,7 +129,7 @@ print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 ###############################################################################
 
 #Make a density plot
-from scipy.stats import gaussian_kde
+
 
 y = pred_truesdf['preds']
 x = pred_truesdf['labels']
@@ -196,66 +195,140 @@ plt.show()
 % Matlab function to calculate model evaluation statistics 
 % S. Robeson, November 1993
 %
-% y(1):  mean of observed variable 
-% y(2):  mean of predicted variable 
-% y(3):  std dev of observed variable 
-% y(4):  std dev of predicted variable 
-% y(5):  correlation coefficient
-% y(6):  intercept of OLS regression
-% y(7):  slope of OLS regression
-% y(8):  mean absolute error (MAE)
-% y(9):  index of agreement (based on MAE)
-% y(10): root mean squared error (RMSE)
-% y(11): RMSE, systematic component
-% y(12): RMSE, unsystematic component
-% y(13): index of agreement (based on RMSE)
+% zb(1):  mean of observed variable 
+% zb(2):  mean of predicted variable 
+% zb(3):  std dev of observed variable 
+% zb(4):  std dev of predicted variable 
+% zb(5):  correlation coefficient
+% zb(6):  intercept of OLS regression
+% zb(7):  slope of OLS regression
+% zb(8):  mean absolute error (MAE)
+% zb(9):  index of agreement (based on MAE)
+% zb(10): root mean squared error (RMSE)
+% zb(11): relative root mean squared error (RMSE)
+% zb(12): RMSE, systematic component
+% zb(13): RMSE, unsystematic component
+% zb(14): index of agreement (based on RMSE)
 
 """ 
 
+met_ls=[]
+for i in range(10):
+    
+    import kfold_DNN # I have to import kfold_DNN new in each iteration
+    EPOCHS = 400
+    kfold_DNN.kfold_DNN(EPOCHS, studyvar)
+       
+    # We build a df of the accumulated predictions vs labels
+    pred_trues = kfold_DNN.pred_trues
+    pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
+    pred_truesdf.columns = ['labels','preds']
+    
+    # Select the last batch of predictions
+    # Predictions accumulate when we want to repeat this several times
+    # Even if we delete all the variables
+    pred_truesdf = pred_truesdf.tail(502)
+    
+    # Scatterplot of predictions vs labels
+    y = pred_truesdf['preds']
+    x = pred_truesdf['labels']
+    
+    # Calculate the point density
+    xy = np.vstack([x,y])
+    z = gaussian_kde(xy)(xy)
+    
+    fig, ax = plt.subplots()
+    ax.scatter(x, y, c=z, s=100)
+    
+    #plt.xlabel('Biomass $(g/m^{2})$')
+    #plt.ylabel('Predicted biomass $(g/m^{2})$')
+    plt.ylabel(f'Predicted {studyvar}')
+    plt.xlabel(f'In situ {studyvar}')
+    plt.xlim(0, max(Mydataset[studyvar]))
+    plt.ylim(0, max(Mydataset[studyvar]))
+    #add a r=1 line
+    line = np.array([0,max(Mydataset[studyvar])])
+    plt.plot(line,line,lw=1, c="black")
+    plt.show()
+    
+    # Calculate additional metrics
+    n = len(pred_truesdf['labels'])
+    so = pred_truesdf['labels'].sum()
+    sp = pred_truesdf['preds'].sum()
+    
+    sumo2 = (pred_truesdf['labels']**2).sum()
+    sump2 = (pred_truesdf['preds']**2).sum()
+    
+    sum2 = ((pred_truesdf['labels']-pred_truesdf['preds'])**2).sum()
+    sumabs = abs(pred_truesdf['labels']-pred_truesdf['preds']).sum()
+    
+    sumdif = (pred_truesdf['labels']-pred_truesdf['preds']).sum()
+    cross = (pred_truesdf['labels']*pred_truesdf['preds']).sum()
+    
+    obar = pred_truesdf['labels'].mean()
+    pbar = pred_truesdf['preds'].mean()
+    
+    sdo = math.sqrt(sumo2/n - obar*obar)
+    sdp = math.sqrt(sump2/n-pbar*pbar)
+    c = cross/n - obar*pbar
+    r = c/(sdo*sdp)
+    r2 = r**2
+    b = r*sdp/sdo
+    a = pbar - b*obar
+    mse = sum2/n
+    mae = sumabs/n
+    
+    msea = a**2
+    msei = 2*a*(b-1)*obar
+    msep = ((b-1)**2) *sumo2/n
+    mses = msea + msei + msep
+    mseu = mse - mses
+    
+    rmse = math.sqrt(mse)
+    
+    rrmse = rmse/obar
+    rmses = math.sqrt(mses)
+    rmseu = math.sqrt(mseu)
+    
+    
+    pe1 = (abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar)).sum()
+    pe2 = ((abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar))**2).sum()
+    d1 = 1 - n*mae/pe1;
+    d2 = 1 - n*mse/pe2;
+    
+    zb = [obar,pbar,sdo,sdp,r,a,b,mae,d1,rmse,rrmse,rmses,rmseu,d2]
+    
+    results = [r2, rrmse, rmses, rmseu]
+    
+    met_ls.append(results)
+    
+    #print(f'r2: {results[0]}')
+    #print(f'rrmse: {results[1]}')
+    #print(f'rmses: {results[2]}')
+    #print(f'rmseu: {results[3]}')
+ 
+met_ls
 
-n = len(pred_truesdf['labels'])
-so = pred_truesdf['labels'].sum()
-sp = pred_truesdf['preds'].sum()
+r2_hat = statistics.mean([x[0] for x in met_ls])
+r2_sd = statistics.pstdev([x[0] for x in met_ls])
 
-sumo2 = (pred_truesdf['labels']**2).sum()
-sump2 = (pred_truesdf['preds']**2).sum()
+rrmse_hat = statistics.mean([x[1] for x in met_ls])
+rrmse_sd = statistics.pstdev([x[1] for x in met_ls])
 
-sum2 = ((pred_truesdf['labels']-pred_truesdf['preds'])**2).sum()
-sumabs = abs(pred_truesdf['labels']-pred_truesdf['preds']).sum()
+rmses_hat = statistics.mean([x[2] for x in met_ls])
+rmses_sd = statistics.pstdev([x[2] for x in met_ls])
 
-sumdif = (pred_truesdf['labels']-pred_truesdf['preds']).sum()
-cross = (pred_truesdf['labels']*pred_truesdf['preds']).sum()
+rmseu_hat = statistics.mean([x[3] for x in met_ls])
+rmseu_sd = statistics.pstdev([x[3] for x in met_ls])
 
-obar = pred_truesdf['labels'].mean()
-pbar = pred_truesdf['preds'].mean()
+print('r2: ' '%.2f'% r2_hat)
+print('r2_sd: ''%.2f'% r2_sd)
 
-import math
-sdo = math.sqrt(sumo2/n - obar*obar)
-sdp = math.sqrt(sump2/n-pbar*pbar)
-c = cross/n - obar*pbar
-r = c/(sdo*sdp)
-r2 = r**2
-b = r*sdp/sdo
-a = pbar - b*obar
-mse = sum2/n
-mae = sumabs/n
+print('rrmse_hat: ' '%.2f'% rrmse_hat)
+print('rrmse_sd: ' '%.2f'% rrmse_sd)
 
-msea = a**2
-msei = 2*a*(b-1)*obar
-msep = ((b-1)**2) *sumo2/n
-mses = msea + msei + msep
-mseu = mse - mses
+print(f'rmses_hat: ' '%.2f'% rmses_hat)
+print(f'rmses_sd: ' '%.2f'%rmses_sd)
 
-rmse = math.sqrt(mse)
-rmses = math.sqrt(mses)
-rmseu = math.sqrt(mseu)
-
-
-pe1 = (abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar)).sum()
-pe2 = ((abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar))**2).sum()
-d1 = 1 - n*mae/pe1;
-d2 = 1 - n*mse/pe2;
-
-y = [obar,pbar,sdo,sdp,r,a,b,mae,d1,rmse,rmses,rmseu,d2]   
-
-# pred_truesdf.to_csv('results/testa.csv')  
+print(f'rmseu_hat: ' '%.2f'% rmseu_hat)
+print(f'rmseu_sd: ' '%.2f'%rmseu_sd)

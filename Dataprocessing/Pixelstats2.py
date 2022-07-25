@@ -25,7 +25,7 @@ df1_0 = pd.read_csv('data/Bexis_data_jonnas_Spekker.csv')
 sd_0 = pd.read_csv('data/Bexis_S1S2_TS_sd_height_NMDS_RaoQ_Dec2021.csv')
 
 # Data with pixel values for May from the holy area.
-holy_0 = pd.read_csv('data/Biomass_S2_Holy.csv')
+holy_0 = pd.read_csv('data/Biomass_S2_Holy_hai2017fixed.csv')
 
 #Drop unused columns
 df1 = df1_0.drop(['number_vascular_plants','explo',
@@ -80,7 +80,7 @@ fig = sns.regplot(data=df_holy, y=df_holy['nir_3']/100, x=df_holy['nir']/100,
             n_boot=100,
             line_kws={"color": "red"})
 plt.xlabel('nir (%) of single pixel')
-plt.ylabel('nir (%) median of 50x50 m plot ')
+plt.ylabel('nir (%) median of 50x50 m plot')
 
 plt.savefig('nir pixel vs median.svg')
 

@@ -44,7 +44,7 @@ def boxplots(df):
         box1=ax1.boxplot(
                         [
                          [row['r2 lo'][0], row['r2'][0], row['r2 up'][0]],
-                         [row['rrmse lo'][0], s2_sr['RRMSE'][0], row['rrmse up'][0]]
+                         [row['rrmse lo'][0], row['RRMSE'][0], row['rrmse up'][0]]
                                           ],
                         positions=[0,1], **props
                         )
@@ -54,7 +54,7 @@ def boxplots(df):
         box2=ax2.boxplot(
                         [
                         [row['srmse lo'][0], row['sRMSE'][0], row['srmse up'][0]],
-                         [row['urmse lo'][0], s2_sr['uRMSE'][0], row['urmse up'][0]]
+                         [row['urmse lo'][0], row['uRMSE'][0], row['urmse up'][0]]
                                           ],
                          
                          
