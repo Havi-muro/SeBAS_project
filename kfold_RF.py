@@ -14,23 +14,13 @@ importance of each fold
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import scipy as sp
-import statistics
 
 #for kfolds
-import sklearn
 from sklearn.model_selection import KFold
-from sklearn import metrics
-from sklearn import preprocessing
-from sklearn.preprocessing import Normalizer
+#from sklearn.preprocessing import Normalizer
 
-from sklearn.datasets import make_regression
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedKFold
 from sklearn.ensemble import RandomForestRegressor
 from tensorflow.keras.layers.experimental import preprocessing
 
@@ -39,12 +29,7 @@ import be_preprocessing
 # Create an object with the result of  the preprocessing module
 Mydataset = be_preprocessing.Mydataset
 
-RMSE_test_list = []
-RRMSE_test_list = []
-RMSE_val_list = []
-rsq_list = []
-p_list = []
-predictions_list=[]
+pred_trues = []
 
 importance_list = []
 
@@ -91,25 +76,10 @@ def kfold_RF(studyvar):
         #######################################################################
         #Predictions
         #Make predictions on the test data using the model 
-        test_predictions = model.predict(test_features).flatten()
-        predictions_list.extend(test_predictions)
-        
-        # Measure this fold's RMSE using the test data
-        RMSE_test = np.sqrt(metrics.mean_squared_error(test_predictions,test_labels))
-        #print(f"RMSE test data: {RMSE_test}")
-        
-        # Calculate r2 between predicted and test data
-        linreg = sp.stats.linregress(test_predictions, test_labels)
-        rsq = linreg.rvalue **2
-        rsq_list.append(rsq)
-        p = linreg.pvalue
-        #p_list.append(p)
-            
-        #Calculate the relative root mean squared error
-        test_mean = np.mean(test_labels)
-        RRMSE_test = (RMSE_test / test_mean)
-        RMSE_test_list.append(RMSE_test)
-        RRMSE_test_list.append(RRMSE_test)
+        test_predictions = model.predict(test_features).flatten()        
+             
+        c = pd.concat([pd.Series(test_labels), pd.Series(test_predictions)], axis=1)
+        pred_trues.append(c)
                
         importance = model.feature_importances_
         importance_list.append(importance)

@@ -32,19 +32,19 @@ from tensorflow.keras.layers.experimental import preprocessing
 from plot_loss import plot_loss
 
 #Preprocess data
-import be_preprocessing
+import be_preprocessing 
 import modelDNN
 
 # Create an object with the result of  the preprocessing module
 Mydataset = be_preprocessing.Mydataset
 
 # Create empty lists to store results of folds
-RMSE_test_list = []
-RRMSE_test_list = []
-RMSE_val_list = []
-rsq_list = []
+#RMSE_test_list = []
+#RRMSE_test_list = []
+#RMSE_val_list = []
+#rsq_list = []
 
-predictions_list = []
+#predictions_list = []
 pred_trues = []
 
 def kfold_DNN(EPOCHS, studyvar):

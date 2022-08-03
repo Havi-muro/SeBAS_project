@@ -45,7 +45,7 @@ import be_preprocessing
 # and to relate results to other variables in the plots afterwards
 
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'biomass_g'
+studyvar = 'SpecRichness'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -108,20 +108,6 @@ RRMSE_test_list = spcv_DNN.RRMSE_test_list
 rsq_list = spcv_DNN.rsq_list
 
 predictions_list = spcv_DNN.predictions_list
-
-###############################################################################
-
-#print average RMSE
-print(f"RMSE test Mean: {statistics.mean(RMSE_test_list)}")
-print(f"RMSE test StdDev: {statistics.stdev(RMSE_test_list)}")
-
-#print average RRSME
-print(f"RRMSE test Mean: {statistics.mean(RRMSE_test_list)}") 
-print(f"RRMSE test StDev: {statistics.stdev(RRMSE_test_list)}")
-
-#print average r squared in validation
-print(f"r squared Mean: {statistics.mean(rsq_list)}") 
-print(f"r squared StdDev: {statistics.stdev(rsq_list)}")
 
 
 ###############################################################################
@@ -212,24 +198,35 @@ plt.show()
 
 """ 
 
+import kfold_DNN # I have to import kfold_DNN new in each iteration
+#import kfold_RF
+
+
 met_ls=[]
-for i in range(10):
+for i in range(5):
     
-    import kfold_DNN # I have to import kfold_DNN new in each iteration
-    EPOCHS = 400
-    kfold_DNN.kfold_DNN(EPOCHS, studyvar)
-       
+    
+    EPOCHS = 500
+    
     # We build a df of the accumulated predictions vs labels
+    # for DNN or RF
+
+    kfold_DNN.kfold_DNN(EPOCHS, studyvar)
     pred_trues = kfold_DNN.pred_trues
+
+    #kfold_RF.kfold_RF(studyvar)
+    #pred_trues = kfold_RF.pred_trues
+ 
+    
     pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
     pred_truesdf.columns = ['labels','preds']
     
     # Select the last batch of predictions
-    # Predictions accumulate when we want to repeat this several times
+    # Predictions accumulate when we iterate 10 times
     # Even if we delete all the variables
-    pred_truesdf = pred_truesdf.tail(502)
+    pred_truesdf = pred_truesdf.tail(Mydataset.shape[0])
     
-    # Scatterplot of predictions vs labels
+    # Density of predictions vs labels
     y = pred_truesdf['preds']
     x = pred_truesdf['labels']
     
@@ -240,33 +237,31 @@ for i in range(10):
     fig, ax = plt.subplots()
     ax.scatter(x, y, c=z, s=100)
     
-    #plt.xlabel('Biomass $(g/m^{2})$')
-    #plt.ylabel('Predicted biomass $(g/m^{2})$')
     plt.ylabel(f'Predicted {studyvar}')
     plt.xlabel(f'In situ {studyvar}')
     plt.xlim(0, max(Mydataset[studyvar]))
     plt.ylim(0, max(Mydataset[studyvar]))
-    #add a r=1 line
+    # add a r=1 line
     line = np.array([0,max(Mydataset[studyvar])])
     plt.plot(line,line,lw=1, c="black")
     plt.show()
     
     # Calculate additional metrics
-    n = len(pred_truesdf['labels'])
-    so = pred_truesdf['labels'].sum()
-    sp = pred_truesdf['preds'].sum()
+    n = len(x)
+    so = x.sum()
+    sp = y.sum()
     
-    sumo2 = (pred_truesdf['labels']**2).sum()
-    sump2 = (pred_truesdf['preds']**2).sum()
+    sumo2 = (x**2).sum()
+    sump2 = (y**2).sum()
     
-    sum2 = ((pred_truesdf['labels']-pred_truesdf['preds'])**2).sum()
-    sumabs = abs(pred_truesdf['labels']-pred_truesdf['preds']).sum()
+    sum2 = ((x-y)**2).sum()
+    sumabs = abs(x-y).sum()
     
-    sumdif = (pred_truesdf['labels']-pred_truesdf['preds']).sum()
-    cross = (pred_truesdf['labels']*pred_truesdf['preds']).sum()
+    sumdif = (x-y).sum()
+    cross = (x*y).sum()
     
-    obar = pred_truesdf['labels'].mean()
-    pbar = pred_truesdf['preds'].mean()
+    obar = x.mean()
+    pbar = y.mean()
     
     sdo = math.sqrt(sumo2/n - obar*obar)
     sdp = math.sqrt(sump2/n-pbar*pbar)
@@ -285,14 +280,12 @@ for i in range(10):
     mseu = mse - mses
     
     rmse = math.sqrt(mse)
-    
     rrmse = rmse/obar
     rmses = math.sqrt(mses)
     rmseu = math.sqrt(mseu)
-    
-    
-    pe1 = (abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar)).sum()
-    pe2 = ((abs(pred_truesdf['preds']-obar) + abs(pred_truesdf['labels']-obar))**2).sum()
+        
+    pe1 = (abs(y-obar) + abs(x-obar)).sum()
+    pe2 = ((abs(y-obar) + abs(x-obar))**2).sum()
     d1 = 1 - n*mae/pe1;
     d2 = 1 - n*mse/pe2;
     
@@ -301,13 +294,12 @@ for i in range(10):
     results = [r2, rrmse, rmses, rmseu]
     
     met_ls.append(results)
-    
-    #print(f'r2: {results[0]}')
-    #print(f'rrmse: {results[1]}')
-    #print(f'rmses: {results[2]}')
-    #print(f'rmseu: {results[3]}')
+
  
-met_ls
+# Check that length = number of loops    
+len(met_ls)
+
+# Extract specific metrics and calculate mean and sd
 
 r2_hat = statistics.mean([x[0] for x in met_ls])
 r2_sd = statistics.pstdev([x[0] for x in met_ls])
@@ -332,3 +324,6 @@ print(f'rmses_sd: ' '%.2f'%rmses_sd)
 
 print(f'rmseu_hat: ' '%.2f'% rmseu_hat)
 print(f'rmseu_sd: ' '%.2f'%rmseu_sd)
+
+# Shut down spider after every run, because some variables
+# or coefficients remain stored somewhere

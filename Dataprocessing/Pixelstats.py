@@ -4,6 +4,11 @@ Created on Wed Jul  6 16:44:48 2022
 
 Pixel statistics
 
+This code analyzes the spatial distribution of the S2 pixel values for each plot.
+It merges the S2 pixel values used to calibrate models with the pixel values 
+of the holy areas. It plots their standard deviation and divergences between
+median values and holy area values.
+
 @author: rsrg_javier
 """
 cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
@@ -14,14 +19,18 @@ import seaborn as sns
 
 import matplotlib.pyplot as plt
 
+##############################################################################
+# Process data
+##############################################################################
+
 # Data with the response variable and time series pixel values
-df1_0 = pd.read_csv('data/Bexis_data_jonnas_Spekker.csv')
+df1_0 = pd.read_csv('data/Bexis_data_pxstats.csv')
 
 # Data with standard deviation pixel values for May
 sd_0 = pd.read_csv('data/Bexis_S1S2_TS_sd_height_NMDS_RaoQ_Dec2021.csv')
 
 # Data with pixel values for May from the holy area.
-holy_0 = pd.read_csv('data/Biomass_S2_Holy.csv')
+holy_0 = pd.read_csv('data/Biomass_S2_Holy_hai2017fixed.csv')
 
 #Drop unused columns
 df1 = df1_0.drop(['number_vascular_plants','explo',
@@ -50,20 +59,104 @@ sd3 = [sd1, sd2]
 sd4 = pd.concat(sd3, axis=1)
 
 #Merge the pixel values from the holy area and the median pixel values
-dff = df1.merge(holy, on =['ep', 'Year'])
+df_holy = df1.merge(holy, on =['ep', 'Year'])
 
-#Create median ndvi and pixel ndvi
-dff['ndvi_median'] = (dff['nir_3']-dff['red_3'])/(dff['nir_3']+dff['red_3'])
-dff['ndvi_pixel'] = (dff['nir']-dff['red'])/(dff['nir']+dff['red'])
+#Create indices with the median and pixel values
+df_holy['ndvi_median'] = (df_holy['nir_3']-df_holy['red_3'])/(df_holy['nir_3']+df_holy['red_3'])
+df_holy['ndvi_pixel'] = (df_holy['nir']-df_holy['red'])/(df_holy['nir']+df_holy['red'])
 
-#sns.scatterplot(data=dff, x='ndvi_median', y='ndvi_pixel')
-sns.regplot(data=dff, y='ndvi_median', x='ndvi_pixel', ci=100, fit_reg=True, robust=True,
+df_holy['nir-red_median'] = (df_holy['nir_3']/df_holy['red_3'])/100
+df_holy['nir-red_pixel'] = (df_holy['nir']/df_holy['red'])/100
+
+
+# Plot using the ratios, ndvi or nir values
+fig = sns.regplot(data=df_holy, y='ndvi_median', x='ndvi_pixel', 
+            ci=100, 
+            fit_reg=True, 
+            robust=True,
+            n_boot=100,
             line_kws={"color": "red"})
 
 
-#TODO: plot median and sd values for all plots
-#fig, ax = fig.plt.subplots(nrows=2, ncols=5)
+fig = sns.regplot(data=df_holy, y=df_holy['nir_3']/100, x=df_holy['nir']/100, 
+            ci=100, 
+            fit_reg=True, 
+            robust=True,
+            n_boot=100,
+            line_kws={"color": "red"})
+plt.xlabel('nir (%) of single pixel')
+plt.ylabel('nir (%) median of 50x50 m plot')
 
+plt.savefig('nir pixel vs median.svg')
+
+
+##############################################################################
+# Plot all the median  of all observations sorted from lower to higher and their standard deviation
+
+# Merge df with sd values
+dfsd = df1.merge(sd4, on=['Year', 'ep'])
+
+# Lazy way of getting field 0-571 to sort observations for the x axis
+dfsd1 = dfsd[['nir_3', 'nir_sd_3','ep', 'Year']].sort_values(by='nir_3').reset_index().reset_index()
+
+# Create upper and lower boundaries with the std
+dfsd1['upper'] = dfsd1['nir_3']+dfsd['nir_sd_3']
+dfsd1['lower'] = dfsd1['nir_3']-dfsd['nir_sd_3']
+
+fig = sns.lineplot(data=dfsd1, x='level_0', y='nir_3')
+plt.xlabel('Observations sorted by nir values')
+plt.ylabel('nir reflectance * 10000')
+
+plt.fill_between(x=dfsd1['level_0'], y1=dfsd1['upper'], y2=dfsd1['lower'], alpha=0.2, color='green')
+
+# plt.savefig('nir median with sd.svg')
+
+##############################################################################
+# Plot the histogram of the std for a ratio (dfsd2) or for nir (dfsd1)
+dfsd2 = dfsd[['nir_3', 'red_3','red_sd_3', 'nir_sd_3','ep', 'Year']]
+
+# Attention!!! I cannot compute a ratio of the standard deviation
+# I should have computed the standard deviation of the ratio
+# dfsd2['red_sd_3_sd'] = dfsd2['red_sd_3']/dfsd2['red_3']
+# dfsd2['nir_sd_3_sd'] = dfsd2['nir_sd_3']/dfsd2['nir_3']
+# dfsd2['ratio_sd'] = dfsd2['nir_sd_3_sd'] / dfsd2['red_sd_3_sd']
+
+
+fig = sns.histplot(dfsd2['nir_sd_3']/100, binwidth=0.20, kde=True)
+plt.xlabel('Standard deviation of nir reflectance (%) from S2')
+plt.axvline(dfsd2['nir_sd_3'].median()/100,
+            color='red')
+plt.savefig('Standard deviation of nir reflectance (%).svg')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##############################################################################
 
 # Prepare dataset to model biomass with holy area values
 Mydataset = dff[['yep', 'biomass_g', 'blue',

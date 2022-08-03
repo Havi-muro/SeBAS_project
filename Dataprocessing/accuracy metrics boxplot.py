@@ -2,6 +2,9 @@
 """
 Created on Thu Jul 21 10:48:19 2022
 
+This code creates a chart plot with the accuracy metrics of each
+combination of predictors
+
 @author: rsrg_javier
 """
 
@@ -10,10 +13,12 @@ import pandas as pd
 
 cd C:\Users\rsrg_javier\Desktop\SEBAS\Manuscripts\2022\July\accuracy table
 
+# read the table with the accuracy metrics
 df = pd.read_excel('accuracy tables.xlsx', sheet_name='biomass RF')
 
 df= df.set_index('Predictors')
 
+# We can intruduce min, median and max manually
 #plt.boxplot([[1, 2, 3], [3,4,5]])
 
 df['r2 up'] = df['r2']+df['rsd']
