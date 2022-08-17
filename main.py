@@ -45,7 +45,7 @@ import be_preprocessing
 # and to relate results to other variables in the plots afterwards
 
 Mydataset = be_preprocessing.Mydataset
-studyvar = 'SpecRichness'
+studyvar = 'biomass_g'
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -53,36 +53,29 @@ print(list(Mydataset.columns))
 ##############################################################################
 
 # 1.- K-fold with DNN
-import kfold_DNN
+import gkfold_DNN
 
 EPOCHS = 500
 
-kfold_DNN.kfold_DNN(EPOCHS, studyvar)
-
-#Put results as variables in global environment
-#RMSE_test_list = kfold_DNN.RMSE_test_list
-#RRMSE_test_list = kfold_DNN.RRMSE_test_list
-#rsq_list = kfold_DNN.rsq_list
+gkfold_DNN.gkfold_DNN(EPOCHS, studyvar)
 
 # We build a df of the accumulated predictions vs labels
-pred_trues = kfold_DNN.pred_trues
+pred_trues = gkfold_DNN2.pred_trues
 pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
 pred_truesdf.columns = ['labels','preds']
 
 ##############################################################################
 
 # 2.- kfold approach with RF
-import kfold_RF
-kfold_RF.kfold_RF(studyvar)
+import gkfold_RF
+gkfold_RF.gkfold_RF(studyvar)
 
-# Put results as variables in global environment
-RMSE_test_list = kfold_RF.RMSE_test_list
-RRMSE_test_list = kfold_RF.RRMSE_test_list
-rsq_list = kfold_RF.rsq_list
+# We build a df of the accumulated predictions vs labels
+pred_trues = gkfold_RF.pred_trues
+pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
+pred_truesdf.columns = ['labels','preds']
 
-predictions_list = kfold_RF.predictions_list
-
-importance_list = kfold_RF.importance_list
+importance_list = gkfold_RF.importance_list
 
 ##############################################################################
 # 3.- Spatial cross-validation approach with DNN by selecting
@@ -116,7 +109,6 @@ predictions_list = spcv_DNN.predictions_list
 
 #Make a density plot
 
-
 y = pred_truesdf['preds']
 x = pred_truesdf['labels']
 
@@ -129,8 +121,8 @@ ax.scatter(x, y, c=z, s=100)
 
 #plt.xlabel('Biomass $(g/m^{2})$')
 #plt.ylabel('Predicted biomass $(g/m^{2})$')
-plt.ylabel(f'Predicted plant height')
-plt.xlabel(f'In situ plant height')
+plt.ylabel(f'Predicted {studyvar}')
+plt.xlabel(f'In situ {studyvar}')
 plt.xlim(0, max(Mydataset[studyvar]))
 plt.ylim(0, max(Mydataset[studyvar]))
 #add a r=1 line
@@ -144,12 +136,11 @@ plt.show()
 
 # Merge the predicted results with the original dataset
 LUI_pred_vs_trues = pd.merge(MydatasetLUI,pred_truesdf, 
-                       how = 'right',
-                       left_index = True, 
-                       right_index = True)
+                             left_on=studyvar,
+                             right_on='labels'
+)
 
 LUI_pred_vs_trues = LUI_pred_vs_trues.rename(columns = {'LUI_2015_2018':'LUI'})
-
 
 # Plot predictions color coded with LUI
 myplot = sns.scatterplot(data=LUI_pred_vs_trues,
@@ -175,12 +166,14 @@ plt.show()
 
 ###############################################################################
 # more error metrics
+# the 5 fold is run 5 times and average accuracy values are reported
 ###############################################################################
 
 """
 % Matlab function to calculate model evaluation statistics 
 % S. Robeson, November 1993
-%
+% Author of matlab function: Zbynek Malenovksy
+
 % zb(1):  mean of observed variable 
 % zb(2):  mean of predicted variable 
 % zb(3):  std dev of observed variable 
@@ -198,35 +191,33 @@ plt.show()
 
 """ 
 
-import kfold_DNN # I have to import kfold_DNN new in each iteration
-#import kfold_RF
+import gkfold_DNN # I have to import in each iteration
+# import kfold_RF
 
 
 met_ls=[]
 for i in range(5):
-    
     
     EPOCHS = 500
     
     # We build a df of the accumulated predictions vs labels
     # for DNN or RF
 
-    kfold_DNN.kfold_DNN(EPOCHS, studyvar)
-    pred_trues = kfold_DNN.pred_trues
+    gkfold_DNN.gkfold_DNN(EPOCHS, studyvar)
+    pred_trues = gkfold_DNN.pred_trues
 
     #kfold_RF.kfold_RF(studyvar)
     #pred_trues = kfold_RF.pred_trues
  
-    
     pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
     pred_truesdf.columns = ['labels','preds']
     
-    # Select the last batch of predictions
+    # Select the last batch of predictions.
     # Predictions accumulate when we iterate 10 times
-    # Even if we delete all the variables
+    # even if we delete all the variables
     pred_truesdf = pred_truesdf.tail(Mydataset.shape[0])
     
-    # Density of predictions vs labels
+    # Predictions vs labels
     y = pred_truesdf['preds']
     x = pred_truesdf['labels']
     
@@ -294,7 +285,6 @@ for i in range(5):
     results = [r2, rrmse, rmses, rmseu]
     
     met_ls.append(results)
-
  
 # Check that length = number of loops    
 len(met_ls)
@@ -313,7 +303,7 @@ rmses_sd = statistics.pstdev([x[2] for x in met_ls])
 rmseu_hat = statistics.mean([x[3] for x in met_ls])
 rmseu_sd = statistics.pstdev([x[3] for x in met_ls])
 
-print('r2: ' '%.2f'% r2_hat)
+print('r2_hat: ' '%.2f'% r2_hat)
 print('r2_sd: ''%.2f'% r2_sd)
 
 print('rrmse_hat: ' '%.2f'% rrmse_hat)

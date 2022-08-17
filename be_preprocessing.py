@@ -74,9 +74,9 @@ Mydataset_vars = Mydataset_0.drop([
                          #### Predictors ####
                 'S2QF',
                   #"LUI_2015_2018",
-                  #"SoilTypeFusion" ,
-                  #'slope',
-                  #'aspect',
+                  "SoilTypeFusion" ,
+                  'slope',
+                  'aspect',
                   'S2Q', 
                   'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
                   'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
@@ -99,7 +99,7 @@ list(Mydataset_vars.columns)
 # Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018',
 #                                 #'explo',
 #                                 'blue',
-#                                'green', 
+#                                 'green', 
 #                                 'red', 
 #                                 'nir', 
 #                                 'nirb', 
@@ -155,8 +155,8 @@ Mydataset = Mydataset.drop(Mydataset[Mydataset['ep'].isin(trees)].index)
 MydatasetLUI=Mydataset
 MydatasetLUI.index = np.arange(0, len(MydatasetLUI))
 
-Mydataset = Mydataset.drop(['Year', 'ep', 'LUI_2015_2018','yep'], axis=1)
+Mydataset = Mydataset.drop(['Year', 'LUI_2015_2018','yep'], axis=1)
 
 # Soil and explo are categorica variables. Change it to one-hot encoded.
 # Comment this line if doing spatial cross-validation.
-Mydataset = pd.get_dummies(Mydataset, prefix='', prefix_sep='')
+#Mydataset = pd.get_dummies(Mydataset, prefix='', prefix_sep='')
