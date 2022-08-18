@@ -31,6 +31,7 @@ import be_preprocessing
 Mydataset = be_preprocessing.Mydataset
 
 pred_trues = []
+testfeatures_order2 = []
 
 importance_list = []
 
@@ -54,6 +55,15 @@ def gkfold_RF(studyvar):
         train_labels = y[train]
         test_features = x[test]
         test_labels = y[test]
+        
+        # We have to extract the test features in the same order than
+        # they are split, so that we can link the predictions to the
+        # original dataset
+        # This only works if all combinations of training features are unique
+        # which is quite likely
+        testfeatures_order= pd.DataFrame(test_features)
+        testfeatures_order.columns = x_columns
+        testfeatures_order2.append(testfeatures_order)
         
         #######################################################################
         # Normalzation
@@ -79,6 +89,8 @@ def gkfold_RF(studyvar):
         test_predictions = model.predict(test_features).flatten()        
              
         c = pd.concat([pd.Series(test_labels), pd.Series(test_predictions)], axis=1)
+        c.columns = ['labels', 'preds']
+
         pred_trues.append(c)
                
         importance = model.feature_importances_

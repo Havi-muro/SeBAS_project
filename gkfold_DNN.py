@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Nov  8 16:54:29 2021
-
-
 This module defines the function that runs the the neural network model
 and runs a group  k-fold cross validation
 The output is a series of lists with accuracy values and predictor
 importance of each fold
-
 Use the shap module for predictor importance
-
 @author: Javier Muro
-
 """
 from sklearn.model_selection import GroupKFold
 from sklearn import metrics
@@ -37,6 +32,7 @@ Mydataset = be_preprocessing.Mydataset
 
 # and a list to store results
 pred_trues = []
+testfeatures_order2 = []
 
 def gkfold_DNN(EPOCHS, studyvar):
     #Create y (labels) and x (features)
@@ -58,6 +54,15 @@ def gkfold_DNN(EPOCHS, studyvar):
         train_labels = y[train]
         test_features = x[test]
         test_labels = y[test]
+        
+        # We have to extract the test features in the same order than
+        # they are split, so that we can link the predictions to the
+        # original dataset
+        # This only works if all combinations of training features are unique
+        # which is quite likely
+        testfeatures_order= pd.DataFrame(test_features)
+        testfeatures_order.columns = x_columns
+        testfeatures_order2.append(testfeatures_order)
         
         #######################################################################
         # Normalzation
@@ -97,12 +102,13 @@ def gkfold_DNN(EPOCHS, studyvar):
         #Predictions
         #Make predictions on the test data using the model, and stored results of each fold
         test_predictions = model.predict(test_features).flatten()
-        #predictions_list.extend(test_predictions)
         
         c = pd.concat([pd.Series(test_labels), pd.Series(test_predictions)], axis=1)
+        c.columns = ['labels', 'preds']
         pred_trues.append(c)
                         
     return model
           
-#if __name__ == "__main__":
-#    gkfold_DNN(EPOCHS, studyvar)
+if __name__ == "__main__":
+    gkfold_DNN(EPOCHS, studyvar)
+

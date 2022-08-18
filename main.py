@@ -41,11 +41,12 @@ from scipy.stats import gaussian_kde
 import be_preprocessing
 
 # Create an object with the result of  the preprocessing module
-# We have to define this to explore the dataset we work with
-# and to relate results to other variables in the plots afterwards
-
+# and name study/response variable
 Mydataset = be_preprocessing.Mydataset
 studyvar = 'SpecRichness'
+
+# We can create an aditional dataset that contains other data
+# we use it to relate results to other variables in the plots afterwards
 MydatasetLUI = be_preprocessing.MydatasetLUI
 print(Mydataset.head())
 print(list(Mydataset.columns))
@@ -59,10 +60,20 @@ EPOCHS = 500
 
 gkfold_DNN.gkfold_DNN(EPOCHS, studyvar)
 
-# We build a df of the accumulated predictions vs labels
-pred_trues = gkfold_DNN2.pred_trues
-pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
-pred_truesdf.columns = ['labels','preds']
+# build a df of the accumulated predictions vs labels
+pred_trues = gkfold_DNN.pred_trues
+pred_truesdf = pd.concat(pred_trues)
+
+# build also a df with the test features in the order in which they were split
+testfeatures_order = gkfold_DNN.testfeatures_order2
+testfeatures_orderdf = pd.concat(testfeatures_order)
+
+# concatenate both laterally. They should correspond.
+rsdf = pd.concat([testfeatures_orderdf, pred_truesdf], axis=1)
+
+# merge it with the original dataset using the features as joining field
+# This allows us to display preds vs lables along with other variables
+Mypredictions = pd.merge(rsdf, MydatasetLUI)
 
 ##############################################################################
 
@@ -70,10 +81,20 @@ pred_truesdf.columns = ['labels','preds']
 import gkfold_RF
 gkfold_RF.gkfold_RF(studyvar)
 
-# We build a df of the accumulated predictions vs labels
+# build a df of the accumulated predictions vs labels
 pred_trues = gkfold_RF.pred_trues
-pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
-pred_truesdf.columns = ['labels','preds']
+pred_truesdf = pd.concat(pred_trues)
+
+# build also a df with the test features in the order in which they were split
+testfeatures_order = gkfold_RF.testfeatures_order2
+testfeatures_orderdf = pd.concat(testfeatures_order)
+
+# concatenate both laterally. They should correspond.
+rsdf = pd.concat([testfeatures_orderdf, pred_truesdf], axis=1)
+
+# merge it with the original dataset using the features as joining field
+# This allows us to display preds vs lables along with other variables
+Mypredictions = pd.merge(rsdf, MydatasetLUI)
 
 importance_list = gkfold_RF.importance_list
 
@@ -109,8 +130,8 @@ predictions_list = spcv_DNN.predictions_list
 
 #Make a density plot
 
-y = pred_truesdf['preds']
-x = pred_truesdf['labels']
+y = Mypredictions['preds']#.astype(float)
+x = Mypredictions['labels']
 
 # Calculate the point density
 xy = np.vstack([x,y])
@@ -133,17 +154,12 @@ plt.show()
 #fig.savefig(f'results/{studyvar} allfolds_densitypolot_DNN.svg')
 
 ###############################################################################
+# Plot displaying another variable for color
 
-# Merge the predicted results with the original dataset
-LUI_pred_vs_trues = pd.merge(MydatasetLUI,pred_truesdf, 
-                             left_on=studyvar,
-                             right_on='labels'
-)
-
-LUI_pred_vs_trues = LUI_pred_vs_trues.rename(columns = {'LUI_2015_2018':'LUI'})
+Mypredictions = Mypredictions.rename(columns = {'LUI_2015_2018':'LUI'})
 
 # Plot predictions color coded with LUI
-myplot = sns.scatterplot(data=LUI_pred_vs_trues,
+myplot = sns.scatterplot(data=Mypredictions,
                          y='preds',
                          x=studyvar,
                          hue = 'LUI', 
@@ -208,9 +224,8 @@ for i in range(5):
 
     #kfold_RF.kfold_RF(studyvar)
     #pred_trues = kfold_RF.pred_trues
- 
+    
     pred_truesdf = pd.concat(pred_trues).reset_index(drop=True)
-    pred_truesdf.columns = ['labels','preds']
     
     # Select the last batch of predictions.
     # Predictions accumulate when we iterate 10 times
