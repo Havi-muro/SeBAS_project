@@ -38,7 +38,7 @@ from shapely.geometry import mapping
 
 from glob import glob
 
-explo = 'hai'
+explo = 'alb'
 
 #mydir = 'C:\\Users\\rsrg_javier\\Desktop\\SEBAS\\GIS\\RS\\ALB\\ALB2020\\'
 #mydir = f'D:\SeBAS_RS\RS\{explo}\ALB2020\\'
@@ -78,8 +78,11 @@ os.chdir(os.path.join('D:/','SeBAS_RS','RS',explo,f'{explo}2020'))
 #                    ) as dst:
 #     dst.write(uno)
             
-# Import all bands in a list and stack them     
+# Import all bands in a list and stack them (spp richness)
 file_list = glob(f'{explo}*_b*.tif')
+
+# Import all bands in a list and stack them (biomass)
+file_list = glob(f'{explo}*20200927_b*.tif')
 
 # In case we need to remove some band
 #file_list = [i for i in file_list if not i.endswith('b06.tif')]
@@ -116,17 +119,17 @@ fig, ax = plt.subplots(figsize=(12, 12))
 ep.plot_bands(arr_st)
 plt.show()
 
-##############################################################################
+###############################################################################
 
 # write the full stack
 meta.update(count = arr_st.shape[0])
-with rio.open(+f'{explo}_fullstack_2017_20july.tif', 'w', **meta, BIGTIFF='YES') as dst:
+with rio.open(f'{explo}_20200510_st', 'w', **meta, BIGTIFF='YES') as dst:
         dst.write(arr_st)
 
 ###############################################################################
 
 # Read raster
-ds1, myrast = raster.read(f'{explo}_fullstack_2017_20july.tif', bands='all')
+ds1, myrast = raster.read(f'{explo}_20200510_st.tif', bands='all')
 
 ep.plot_bands(myrast[0])
 ep.hist(myrast[0])
@@ -156,7 +159,10 @@ plt.show()
 myrast_reshape = changeDimension(myrast)
 
 # Read model
-model = keras.models.load_model('C:/Users/rsrg_javier/Documents/GitHub/SeBAS_project/spatial/SpecRichness_adam_model_S2bands_20July')
+#model = keras.models.load_model('C:/Users/rsrg_javier/Documents/GitHub/SeBAS_project/spatial/SpecRichness_adam_model_S2bands_20July')
+mpathb = os.path.join('C:\\','Users','rsrg_javier','Documents','GitHub','SeBAS_project','spatial','Biomass_model_S2bands')
+mpathspp = os.path.join('C:\\','Users','rsrg_javier','Documents','GitHub','SeBAS_project','spatial','SpecRichness_adam_model_S2bands_20July')
+model = keras.models.load_model(mpathb)
 
 #Apply model
 myrast_pred = model.predict(myrast_reshape)
@@ -186,7 +192,9 @@ ep.hist(predict_masked, figsize=(5,5))
 # Reshape the raster according to the original dimensions
 prediction = np.reshape(predict_masked, (ds1.RasterYSize, ds1.RasterXSize))
 
+raster.export(prediction, ds1, filename=f'{explo}_20200510_biomass_3.tif', dtype='float')
 
+# clip (under development)
 # set path to mask and open it
 aoi = os.path.join(f'{explo}_grass_aoa_2020.shp')
 extent = gpd.read_file(aoi)

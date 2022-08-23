@@ -1,78 +1,64 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jul 21 18:05:35 2022
+Created on Fri Jul 22 08:27:33 2022
 
 @author: rsrg_javier
 """
 
-from rasterio.plot import plotting_extent
+import os
 import geopandas as gpd
+import rioxarray as rxr
+import rasterio as rio
+import matplotlib.pyplot as plt
+from shapely.geometry import mapping
 
-landsat_bands_data_path = "D:\\SeBAS_RS\\RS\\alb\\ALB2020\\tomask\\*.tif"
-stack_band_paths = glob(landsat_bands_data_path)
-stack_band_paths.sort()
-
-# Create output directory and the output path
-
-output_dir = 'D:\\SeBAS_RS\\RS\\alb\\ALB2020\\tomask\\outputs\\'
-
-raster_out_path = os.path.join(output_dir, "raster.tiff")
-
-array, raster_prof = es.stack(stack_band_paths, out_path=raster_out_path)
-
-extent = plotting_extent(array[0], raster_prof["transform"])
+from pyrsgis import raster
 
 
-fig, ax = plt.subplots(figsize=(12, 12))
-ep.plot_rgb(
-    array,
-    ax=ax,
-    stretch=True,
-    extent=extent,
-    str_clip=0.5,
-    title="RGB Image of Un-cropped Raster",
-)
-plt.show()
+from glob import glob
 
-ep.hist(array)
-plt.show()
+explo = 'sch'
+year = '2020'
 
-path2shp = 'C:/Users/rsrg_javier/Desktop/SEBAS/GIS/'
-crop_bound = gpd.read_file(path2shp+'alb_grass_aoa_2020.shp')
+# set wd 
+os.chdir(os.path.join('D:\\','SeBAS_RS','RS',f'{explo}',f'{explo}{year}\\'))
 
 
-# reproject the data
-with rasterio.open(stack_band_paths[0]) as raster_crs:
-    crop_raster_profile = raster_crs.profile
-    crop_bound_utm13N = crop_bound.to_crs(crop_raster_profile["crs"])
+# set path to data (optional)
+mypath = os.path.join('D:\\','SeBAS_RS','RS',f'{explo}',f'{explo}{year}\\')
+extent = gpd.read_file(mypath+f'{explo}_grass_aoa_2020.shp')
+extent.crs
+
+
+spp = rxr.open_rasterio(mypath+f'{explo}_Spprich_adam_2020_20July.tiff', masked=True).squeeze()
+spp.rio.crs
+
+
+# plot raster and mask
+# f, ax = plt.subplots(figsize=(10, 5))
+# spp.plot.imshow()
+# extent.plot(ax=ax, alpha=0.8)
+# plt.show()
+
+
+# clip
+# Spp richness (one per year)
+sppcl = spp.rio.clip(extent.geometry.apply(mapping, extent.crs)) # This is needed if your GDF is in a diff CRS than the raster data
+
+# f, ax = plt.subplots(figsize=(10, 5))
+# sppcl.plot.imshow()
+
+sppcl.rio.to_raster(mypath+ f'{explo}_Spprich_adam_2020_20July_cl.tiff')
+
+
+# Biomass in loop
+loopls = glob('*_biomass_looped.tif')
+
+for i in range(len(loopls)):
+    bm = rxr.open_rasterio(mypath+loopls[i], masked=True).squeeze()
+    bm_cl = bm.rio.clip(extent.geometry.apply(mapping, extent.crs))
+    bm_cl.rio.to_raster(f'cl_{loopls[i]}.tif')
 
 
     
-# crop
-band_paths_list = es.crop_all(
-    stack_band_paths, output_dir, crop_bound_utm13N, overwrite=True
-)
 
-#To crop one band
-# Open Landsat image as a Rasterio object in order to crop it
-
-with rasterio.open(stack_band_paths[0]) as src:
-    single_cropped_image, single_cropped_meta = es.crop_image(
-        src, crop_bound_utm13N
-    )
-
-# Create the extent object
-single_crop_extent = plotting_extent(
-    single_cropped_image[0], single_cropped_meta["transform"]
-)
-
-# Plot the newly cropped image
-fig, ax = plt.subplots(figsize=(12, 6))
-crop_bound_utm13N.boundary.plot(ax=ax, color="red", zorder=10)
-ep.plot_bands(
-    single_cropped_image,
-    ax=ax,
-    extent=single_crop_extent,
-    title="Single Cropped Raster and Fire Boundary",
-)
-plt.show()
