@@ -68,6 +68,9 @@ df_holy['ndvi_pixel'] = (df_holy['nir']-df_holy['red'])/(df_holy['nir']+df_holy[
 df_holy['nir-red_median'] = (df_holy['nir_3']/df_holy['red_3'])/100
 df_holy['nir-red_pixel'] = (df_holy['nir']/df_holy['red'])/100
 
+# choose the band to use for calculations
+band = 'green'
+
 
 # Plot using the ratios, ndvi or nir values
 fig = sns.regplot(data=df_holy, y='ndvi_median', x='ndvi_pixel', 
@@ -78,16 +81,16 @@ fig = sns.regplot(data=df_holy, y='ndvi_median', x='ndvi_pixel',
             line_kws={"color": "red"})
 
 
-fig = sns.regplot(data=df_holy, y=df_holy['nir_3']/100, x=df_holy['nir']/100, 
+fig = sns.regplot(data=df_holy, y=df_holy[f'{band}']/100, x=df_holy[f'{band}_3']/100, 
             ci=100, 
             fit_reg=True, 
             robust=True,
             n_boot=100,
             line_kws={"color": "red"})
-plt.xlabel('nir (%) of single pixel')
-plt.ylabel('nir (%) median of 50x50 m plot')
+plt.xlabel(f'{band} reflectance of single pixel (%)')
+plt.ylabel(f'Median {band} refl. of 50x50 m plot (%)')
 
-plt.savefig('nir pixel vs median.svg')
+plt.savefig(f'{band} pixel vs median.svg')
 
 
 ##############################################################################
@@ -97,15 +100,15 @@ plt.savefig('nir pixel vs median.svg')
 dfsd = df1.merge(sd4, on=['Year', 'ep'])
 
 # Lazy way of getting field 0-571 to sort observations for the x axis
-dfsd1 = dfsd[['nir_3', 'nir_sd_3','ep', 'Year']].sort_values(by='nir_3').reset_index().reset_index()
+dfsd1 = dfsd[[f'{band}_3', f'{band}_sd_3','ep', 'Year']].sort_values(by=f'{band}_3').reset_index().reset_index()
 
 # Create upper and lower boundaries with the std
-dfsd1['upper'] = dfsd1['nir_3']+dfsd['nir_sd_3']
-dfsd1['lower'] = dfsd1['nir_3']-dfsd['nir_sd_3']
+dfsd1['upper'] = dfsd1[f'{band}_3']+dfsd[f'{band}_sd_3']
+dfsd1['lower'] = dfsd1[f'{band}_3']-dfsd[f'{band}_sd_3']
 
-fig = sns.lineplot(data=dfsd1, x='level_0', y='nir_3')
-plt.xlabel('Observations sorted by nir values')
-plt.ylabel('nir reflectance * 10000')
+fig = sns.lineplot(data=dfsd1, x='level_0', y=f'{band}_3')
+plt.xlabel(f'Observations sorted by {band} values')
+plt.ylabel(f'{band} reflectance * 10000')
 
 plt.fill_between(x=dfsd1['level_0'], y1=dfsd1['upper'], y2=dfsd1['lower'], alpha=0.2, color='green')
 
@@ -113,7 +116,7 @@ plt.fill_between(x=dfsd1['level_0'], y1=dfsd1['upper'], y2=dfsd1['lower'], alpha
 
 ##############################################################################
 # Plot the histogram of the std for a ratio (dfsd2) or for nir (dfsd1)
-dfsd2 = dfsd[['nir_3', 'red_3','red_sd_3', 'nir_sd_3','ep', 'Year']]
+dfsd2 = dfsd[[f'{band}_3',f'{band}_sd_3','ep', 'Year']]
 
 # Attention!!! I cannot compute a ratio of the standard deviation
 # I should have computed the standard deviation of the ratio
@@ -122,11 +125,14 @@ dfsd2 = dfsd[['nir_3', 'red_3','red_sd_3', 'nir_sd_3','ep', 'Year']]
 # dfsd2['ratio_sd'] = dfsd2['nir_sd_3_sd'] / dfsd2['red_sd_3_sd']
 
 
-fig = sns.histplot(dfsd2['nir_sd_3']/100, binwidth=0.20, kde=True)
-plt.xlabel('Standard deviation of nir reflectance (%) from S2')
-plt.axvline(dfsd2['nir_sd_3'].median()/100,
+fig = sns.histplot(dfsd2[f'{band}_sd_3']/100, binwidth=0.1, kde=True)
+plt.xlim(0,2)
+plt.ylim(0,250)
+
+plt.xlabel(f'Standard deviation of {band} reflectance (%)')
+plt.axvline(dfsd2[f'{band}_sd_3'].median()/100,
             color='red')
-plt.savefig('Standard deviation of nir reflectance (%).svg')
+plt.savefig(f'Standard deviation of {band} reflectance (%).svg')
 
 
 

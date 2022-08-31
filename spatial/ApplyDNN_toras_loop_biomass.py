@@ -12,7 +12,7 @@ It loos over the list of images, groups them by date, and apply the model
 import earthpy.spatial as es
 #import earthpy.plot as ep
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 #import pandas as pd
 
@@ -27,14 +27,14 @@ from pyrsgis import raster
 from pyrsgis.convert import changeDimension
 
 import geopandas as gpd
-import rioxarray as rxr
+#import rioxarray as rxr
 import rasterio as rio
 #from shapely.geometry import mapping
 
 from glob import glob
 
-explo = 'hai'
-year = '2020'
+explo = 'alb'
+year = '2021'
 
 
 # open with os so that shashes and capitals don't matter
@@ -44,7 +44,6 @@ os.chdir(os.path.join('D:\\','SeBAS_RS','RS',f'{explo}',f'{explo}{year}\\'))
 file_list1 = glob(f'{explo}*_b*.tif')
 
 # list comprehension to get a list with the dates for the biomass model
-# For the spp richness model, use file_list1 directly
 sliced = [x[4:12] for x in file_list1]
 
 # remote duplicates so we get the list of dates
@@ -75,10 +74,10 @@ for i in range(len(sliced_u)):
     # Reshape the raster according to the original dimensions
     prediction = np.reshape(myrast_pred, (arr_st.shape[1], arr_st.shape[2]))
     
-    # We eliminate edge values
+    # Eliminate edge values
     clipped_pred = np.clip(prediction, 0, 800, out=None)
 
-    # Export raster with pyrsgis using the metadata of ine of the images
+    # Export raster with pyrsgis using the metadata of one of the images
     raster.export(clipped_pred, ds1, filename=f'{explo}_{sliced_u[i]}_biomass_looped.tif', dtype='float')
     
     ##############################################################################
