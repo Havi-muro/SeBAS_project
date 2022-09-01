@@ -64,14 +64,14 @@ arr_st, meta = es.stack(file_list)
 
 ###############################################################################
 
-# # write the full stack
+# # write the full stack in case it is necessary
 # meta.update(count = arr_st.shape[0])
 # with rio.open(f'{explo}_{year}_fullstack.tif', 'w', **meta, BIGTIFF='YES') as dst:
 #         dst.write(arr_st)
 
 ###############################################################################
 
-# # Read raster
+# # Read the full stack with pyrsgis
 # ds1, myrast = raster.read(f'{explo}_{year}_fullstack.tif', bands='all')
 
 # ep.plot_bands(myrast[0])
@@ -98,12 +98,15 @@ print(np.amin(myrast_pred))
 # Reshape the raster according to the original dimensions
 #prediction = np.reshape(predict_masked, (ds1.RasterYSize, ds1.RasterXSize))
 prediction = np.reshape(myrast_pred, (arr_st.shape[1], arr_st.shape[2]))
-clipped_pred = np.clip(prediction, 0, 800, out=None)
+
+# more than 70 spp per 4 x 4 is not reasonable, so we eliminate those values
+#clipped_pred = np.clip(prediction, 0, 100, out=None)
+prediction[prediction>70] = np.nan
 
 # Open one of the bands to get the metadata with pyrsgis.raster
 ds1, myrast = raster.read(file_list[1], bands=1)
 
-raster.export(clipped_pred, ds1, filename=f'{explo}_spprich_{year}.tif', dtype='float')
+raster.export(prediction, ds1, filename=f'{explo}_spprich_{year}.tif', dtype='float')
 
 # clip:  We have to read the prediction with rasterio to apply rio.clip
 # set path to mask and open it

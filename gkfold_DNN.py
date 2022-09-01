@@ -59,7 +59,7 @@ def gkfold_DNN(EPOCHS, studyvar):
         # they are split, so that we can link the predictions to the
         # original dataset
         # This only works if all combinations of training features are unique
-        # which is quite likely
+        # which is the case (impossible to have identical combinations)
         testfeatures_order= pd.DataFrame(test_features)
         testfeatures_order.columns = x_columns
         testfeatures_order2.append(testfeatures_order)

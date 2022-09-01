@@ -33,7 +33,7 @@ import rasterio as rio
 
 from glob import glob
 
-explo = 'alb'
+explo = 'hai'
 year = '2021'
 
 
@@ -75,10 +75,11 @@ for i in range(len(sliced_u)):
     prediction = np.reshape(myrast_pred, (arr_st.shape[1], arr_st.shape[2]))
     
     # Eliminate edge values
-    clipped_pred = np.clip(prediction, 0, 800, out=None)
+    #clipped_pred = np.clip(prediction, 0, 800, out=None)
+    prediction[prediction>800] = np.nan
 
     # Export raster with pyrsgis using the metadata of one of the images
-    raster.export(clipped_pred, ds1, filename=f'{explo}_{sliced_u[i]}_biomass_looped.tif', dtype='float')
+    raster.export(prediction, ds1, filename=f'{explo}_{sliced_u[i]}_biomass_looped.tif', dtype='float')
     
     ##############################################################################
 

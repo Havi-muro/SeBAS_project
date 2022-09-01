@@ -93,29 +93,29 @@ Mydataset_vars = Mydataset_0.drop([
 
 list(Mydataset_vars.columns)
 
-#Select study variable and predictors by subsetting
-#keep variable 'explo' for spatial cross-validation
+# Select study variable and predictors by subsetting
+# keep variable 'explo' for spatial cross-validation
 # SpecRichness or biomass_g
-# Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018',
-#                                 #'explo',
-#                                 'blue',
-#                                 'green', 
-#                                 'red', 
-#                                 'nir', 
-#                                 'nirb', 
-#                                 're1',
-#                                 're2',
-#                                 're3', 
-#                                 'swir1', 
-#                                 'swir2',
-#                                 #'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
-#                                 #  ,'S2Q',
-#                                 #'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI'
-#                                 #'VHMean_May','VVMean_May','VVVH'
-#                                 #'SoilTypeFusion'
-#                                 #,'slope', 'aspect'
-#                                 #,'TWI'
-#                                 ]]
+Mydataset_vars = Mydataset_0[['Year', 'ep', 'biomass_g', 'yep', 'LUI_2015_2018',
+                                #'explo',
+                                'blue',
+                                'green', 
+                                'red', 
+                                'nir', 
+                                'nirb', 
+                                're1',
+                                're2',
+                                're3', 
+                                'swir1', 
+                                'swir2',
+                                #'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
+                                #  ,'S2Q',
+                                #'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI'
+                                #'VHMean_May','VVMean_May','VVVH'
+                                #'SoilTypeFusion'
+                                #,'slope', 'aspect'
+                                #,'TWI'
+                                ]]
 
 # nir_3 corresponds to Mid may. 
 # The differences in correlation between the orignial band and nir_3

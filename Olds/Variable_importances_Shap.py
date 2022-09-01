@@ -202,20 +202,44 @@ def plot_loss(history):
   plt.legend()
   plt.grid(True)
 
-#Create y (labels) and x (features)
-x_columns = Mydataset.columns.drop(studyvar)
-x = Mydataset[x_columns]
-y = Mydataset[studyvar]
+
 
 # Define the K-fold Cross Validator
 kfold = KFold(5, shuffle=False)
 
-RMSE_test_list = []
-RRMSE_test_list = []
-RMSE_val_list = []
-rsq_list = []
+# and a list to store results
+pred_trues = []
+testfeatures_order2 = []
 
-var_imp_list = []
+def gkfold_DNN(EPOCHS, studyvar):
+    #Create y (labels) and x (features)
+    epg = Mydataset['ep']
+    x_columns = Mydataset.columns.drop([studyvar, 'ep'])
+    x = Mydataset[x_columns].values
+    y = Mydataset[studyvar].values
+     
+    # K-fold Cross Validation model evaluation
+    gkf = GroupKFold(n_splits=5)
+    #EPOCHS = 200
+        
+    fold = 0
+    for split, (train, test) in enumerate(gkf.split(x, y, groups=epg)):
+        fold+=1
+        print(f'Fold#{fold}')
+        
+        train_features = x[train]
+        train_labels = y[train]
+        test_features = x[test]
+        test_labels = y[test]
+        
+        # We have to extract the test features in the same order than
+        # they are split, so that we can link the predictions to the
+        # original dataset
+        # This only works if all combinations of training features are unique
+        # which is quite likely
+        testfeatures_order= pd.DataFrame(test_features)
+        testfeatures_order.columns = x_columns
+        testfeatures_order2.append(testfeatures_order)
 
 # K-fold Cross Validation model evaluation
 fold = 0
