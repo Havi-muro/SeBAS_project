@@ -11,9 +11,10 @@ import matplotlib.pyplot as plt
 import be_preprocessing
 
 # Create an object with the result of  the preprocessing module
-Mydataset = be_preprocessing.Mydataset
+
 
 def plot_loss(history, EPOCHS, studyvar):
+  Mydataset = be_preprocessing.be_preproc(studyvar)[0]  
   plt.plot(history.history['loss'])
   plt.plot(history.history['val_loss'])
   plt.ylim([0, max(Mydataset[studyvar])])

@@ -27,9 +27,6 @@ from tensorflow.keras.layers.experimental import preprocessing
 
 import be_preprocessing
 
-# Create an object with the result of  the preprocessing module
-Mydataset = be_preprocessing.Mydataset
-
 pred_trues = []
 testfeatures_order2 = []
 
@@ -37,6 +34,7 @@ importance_list = []
 
 
 def gkfold_RF(studyvar):
+    Mydataset = be_preprocessing.be_preproc(studyvar)[0]
     #Create y (labels) and x (features)
     epg = Mydataset['ep']
     x_columns = Mydataset.columns.drop([studyvar, 'ep'])

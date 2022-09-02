@@ -20,8 +20,6 @@ when running the model a second time. Have to fix
 @author: Javier Muro
 """
 
-cd C:\Users\rsrg_javier\Documents\GitHub\SeBAS_project
-
 #conda activate earth-analytics-python
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -33,21 +31,26 @@ import seaborn as sns
 import scipy as sp
 import statistics
 import math
-
+import os
 from scipy.stats import gaussian_kde
 
+os.chdir(os.path.join('C://','Users','rsrg_javier','Documents','GitHub','SeBAS_project'))
+
 # Preprocess data
-# in be_preprocessing.py, select the study variable and the predictors
+# in be_preprocessing.py, select the  the predictors
 import be_preprocessing
 
-# Create an object with the result of  the preprocessing module
-# and name study/response variable
-Mydataset = be_preprocessing.Mydataset
-studyvar = 'SpecRichness'
+# select the study variable ('SpecRichness' or 'biomass_g') and instantiate 
+# the resulting dataframes. One is the dataframe to analyze, and MydatasetLUI
+# contains other info such as LUI to plot the predictions colored by 
+# another environmental variable
+studyvar = 'biomass_g'
+
+Mydataset = be_preprocessing.be_preproc(studyvar)[0]
 
 # We can create an aditional dataset that contains other data
 # we use it to relate results to other variables in the plots afterwards
-MydatasetLUI = be_preprocessing.MydatasetLUI
+MydatasetLUI = be_preprocessing.be_preproc(studyvar)[1]
 print(Mydataset.head())
 print(list(Mydataset.columns))
 
@@ -107,6 +110,8 @@ import spcv_DNN
 
 # Choose which site is used for test and which one(s) for training
 EPOCHS = 200
+Mydataset['explo'] = MydatasetLUI['explo']
+Mydataset=Mydataset.drop('ep', axis=1)
 train_dataset = Mydataset[(Mydataset['explo']=='SCH')       
                           | (Mydataset['explo'] == 'HAI')   # take this line out to use only 1 site for training
                           ].drop(['explo'], axis=1)
@@ -206,13 +211,13 @@ plt.show()
 % zb(14): index of agreement (based on RMSE)
 
 """ 
-
-import gkfold_DNN # I have to import in each iteration
+# I have to import in each iteration
+import gkfold_DNN 
 # import kfold_RF
 
 
 met_ls=[]
-for i in range(5):
+for i in range(3):
     
     EPOCHS = 500
     

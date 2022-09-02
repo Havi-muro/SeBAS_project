@@ -9,15 +9,15 @@ Use the shap module for predictor importance
 @author: Javier Muro
 """
 from sklearn.model_selection import GroupKFold
-from sklearn import metrics
+#from sklearn import metrics
 
 import numpy as np
 import pandas as pd
-import scipy as sp
-import tensorflow as tf
-from tensorflow import keras
+#import scipy as sp
+#import tensorflow as tf
+#from tensorflow import keras
 from keras.callbacks import EarlyStopping
-from tensorflow.keras import layers
+#from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
 #Import function to display loss
@@ -27,14 +27,15 @@ from plot_loss import plot_loss
 import be_preprocessing 
 import modelDNN
 
-# Create an object with the result of  the preprocessing module
-Mydataset = be_preprocessing.Mydataset
-
-# and a list to store results
+# create list to store results
 pred_trues = []
 testfeatures_order2 = []
 
+
 def gkfold_DNN(EPOCHS, studyvar):
+    # Create an object with the result of  the preprocessing module
+    Mydataset = be_preprocessing.be_preproc(studyvar)[0]
+
     #Create y (labels) and x (features)
     epg = Mydataset['ep']
     x_columns = Mydataset.columns.drop([studyvar, 'ep'])
@@ -109,6 +110,6 @@ def gkfold_DNN(EPOCHS, studyvar):
                         
     return model
           
-if __name__ == "__main__":
-    gkfold_DNN(EPOCHS, studyvar)
+# if __name__ == "__main__":
+#     gkfold_DNN(EPOCHS, studyvar)
 

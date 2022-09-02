@@ -12,30 +12,30 @@ importance of each fold
 
 """
 
-from sklearn.model_selection import KFold
+#from sklearn.model_selection import KFold
 from sklearn import metrics
-#from sklearn import preprocessing
+from sklearn import preprocessing
 #from sklearn.preprocessing import Normalizer
 
 import numpy as np
 import pandas as pd
 import scipy as sp
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
+#import tensorflow as tf
+#from tensorflow import keras
+#from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
-from sklearn.utils import shuffle
+#from sklearn.utils import shuffle
 
 #Import function to display loss
 from plot_loss import plot_loss
 
 #Preprocess data
-import be_preprocessing
+#import be_preprocessing
 import modelDNN
 
 # Create an object with the result of  the preprocessing module
-Mydataset = be_preprocessing.Mydataset
+#Mydataset = be_preprocessing.Mydataset
 
 # Create empty lists to store results of folds
 RMSE_test_list = []
@@ -49,7 +49,7 @@ LOFO_list = []
 LOFO_Ordered_list = []
 
 def spcv_DNN(EPOCHS, train_dataset, test_dataset, studyvar):
- 
+    #Mydataset = be_preprocessing.be_preproc(studyvar)[0]
     for iteration in range(5):
     # Recommended to shuffle here, since despite the shuffle is True by default when we fit the model,
     # the validation data has to be suffled before it is separated from the training data
@@ -121,22 +121,6 @@ def spcv_DNN(EPOCHS, train_dataset, test_dataset, studyvar):
         RMSE_test_list.append(RMSE_test)
         RRMSE_test_list.append(RRMSE_test)
         
-        # # Function to calculate predictors importance via leave one out
-        # def LOFO(model, X, Y):
-        #     OneOutScore = []
-        #     n = X.shape[0]
-        #     for i in range(0,X.shape[1]):
-        #         newX = X.copy()
-        #         newX[:,i] = 0 #np.random.normal(0,1,n) #I had to change this from newX.iloc[:,i] because I am not working with pd. dataframe but with numpy arrays
-        #         OneOutScore.append(model.evaluate(newX, Y, verbose=0))
-        #     OneOutScore = pd.DataFrame(OneOutScore[:])
-        #     ordered = np.argsort(-OneOutScore.iloc[:,0])
-        #     return(OneOutScore, ordered)
-    
-        # # apply on the model
-        # LOFO, LOFO_Ordered = LOFO(model, train_features, train_labels)
-        # LOFO_list.append(LOFO)
-        # LOFO_Ordered_list.append(LOFO_Ordered)
-          
+
 if __name__ == "__main__":
     spcv_DNN(EPOCHS, train_dataset, test_dataset, studyvar)
