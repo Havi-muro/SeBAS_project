@@ -30,6 +30,7 @@ import os
 #import pyrsgis
 from pyrsgis import raster
 from pyrsgis.convert import changeDimension
+#from pyrsgis import convert
 
 import geopandas as gpd
 import rioxarray as rxr
@@ -84,7 +85,7 @@ arr_st, meta = es.stack(file_list)
 #Change raster dimensions. 
 #No need to normalize, since the model performs normalization
 myrast_reshape = changeDimension(arr_st)
-#myrast_reshape = changeDimension(myrast)
+# changeDimension will be changed to array_to_table()
 
 # Read model
 pathspp = os.path.join('C:\\','Users','rsrg_javier','Documents','GitHub','SeBAS_project','spatial','SpecRichness_adam_model_S2bands_20July')

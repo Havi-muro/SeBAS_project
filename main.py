@@ -44,7 +44,7 @@ import be_preprocessing
 # the resulting dataframes. One is the dataframe to analyze, and MydatasetLUI
 # contains other info such as LUI to plot the predictions colored by 
 # another environmental variable
-studyvar = 'biomass_g'
+studyvar = 'SpecRichness'
 
 Mydataset = be_preprocessing.be_preproc(studyvar)[0]
 
