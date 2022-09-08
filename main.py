@@ -156,7 +156,7 @@ line = np.array([0,max(Mydataset[studyvar])])
 plt.plot(line,line,lw=1, c="black")
 plt.show()
 
-#fig.savefig(f'results/{studyvar} allfolds_densitypolot_DNN.svg')
+fig.savefig(f'results/{studyvar}_densitypolot_RF_S1_S2sr_S2ratios_TE.svg')
 
 ###############################################################################
 # Plot displaying another variable for color

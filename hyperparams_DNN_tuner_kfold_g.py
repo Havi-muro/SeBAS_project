@@ -34,10 +34,10 @@ os.chdir(os.path.join('C:/','Users','rsrg_javier','Documents','GitHub','SeBAS_pr
 import be_preprocessing
 
 # Create an object with the result of  the preprocessing module
-Mydataset = be_preprocessing.Mydataset
-
 #studyvar = 'biomass_g'
 studyvar = 'biomass_g'
+Mydataset = be_preprocessing.be_preproc(studyvar)[0]
+
 
 print(Mydataset.head())
 print(list(Mydataset.columns))

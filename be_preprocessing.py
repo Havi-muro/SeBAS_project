@@ -75,18 +75,19 @@ def be_preproc(studyvar):
                 'number_vascular_plants',
                       
                                  #### Predictors ####
-                        'S2QF',
-                          #"LUI_2015_2018",
-                          "SoilTypeFusion" ,
-                          'slope',
-                          'aspect',
-                          'S2Q', 
-                          'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
-                          'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
-                          'LAI',
-                          'VHMean_May',
-                          'VVMean_May',
-                          'VVVH',
+                          'S2QF',
+                           #"LUI_2015_2018",
+                            "SoilTypeFusion" ,
+                            'slope',
+                            'aspect',
+                            'S2Q', 
+                           
+                            'blue','green', 'red', 'nir', 'nirb', 're1','re2','re3', 'swir1', 'swir2',
+                            'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI',
+                            'LAI',
+                            'VHMean_May',
+                            'VVMean_May',
+                            'VVVH',
                           'TWI'
                ], axis=1)
     elif studyvar == 'biomass_g':
@@ -110,12 +111,11 @@ def be_preproc(studyvar):
                                         're3', 
                                         'swir1', 
                                         'swir2',
-                                        #'blue_sd_3','green_sd_3', 'red_sd_3', 'nir_sd_3', 'nirb_sd_3', 're1_sd_3','re2_sd_3','re3_sd_3', 'swir1_sd_3', 'swir2_sd_3',
-                                        #  ,'S2Q',
-                                        #'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI'
-                                        #'VHMean_May','VVMean_May','VVVH'
-                                        #'SoilTypeFusion'
-                                        #,'slope', 'aspect'
+                                        # 'EVI','SAVI', 'GNDVI', 'ARVI', 'CHLRE', 
+                                        # 'MCARI','NDII','MIRNIR', 'MNDVI', 'NDVI', 'LAI',
+                                        # 'VHMean_May','VVMean_May','VVVH',
+                                        # 'SoilTypeFusion'
+                                        # ,'slope', 'aspect'
                                         #,'TWI'
                                         ]]
     else:
@@ -164,5 +164,6 @@ def be_preproc(studyvar):
     
     # Soil and explo are categorica variables. Change it to one-hot encoded.
     # Comment this line if doing spatial cross-validation.
-    #Mydataset = pd.get_dummies(Mydataset, prefix='', prefix_sep='')
+    #Mydataset_soil = pd.get_dummies(Mydataset['SoilTypeFusion'], prefix='', prefix_sep='')
+    #Mydataset = pd.concat([Mydataset, Mydataset_soil], axis=1).drop('SoilTypeFusion', axis=1)
     return Mydataset, MydatasetLUI
