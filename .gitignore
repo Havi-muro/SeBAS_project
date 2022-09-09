@@ -103,9 +103,13 @@ venv.bak/
 .ropeproject
 
 # mkdocs documentation
-/site
-/results
-/data/rs
+keras_tuner_dir/
+Olds/
+Dataprocessing/
+results/
+data/Old/
+spatial/Dataprocessing
+
 
 # mypy
 .mypy_cache/
