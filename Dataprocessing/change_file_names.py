@@ -8,7 +8,11 @@ Created on Thu Aug 25 13:58:18 2022
 import os
 from glob import glob
 
-cd D:\SeBAS_RS\RS\HAI\HAI2021
+#cd D:\SeBAS_RS\RS\HAI\HAI2021
+
+explo = 'sch'
+year = '2021'
+os.chdir(os.path.join('D:\\','SeBAS_RS','RS',f'{explo}',f'{explo}{year}\\'))
 
 # make lists with the different bands
 blue = glob('*blue.tif')
@@ -31,7 +35,25 @@ for name in range(len(band)):
     newname = band[name][0:13]+'b09.tif'
     rename = os.rename(oldname, newname)
     
+    
+    
+##############################################################################
 # Playground
+
+
+
+
+
+
+mylist = glob('cl_*.tif')
+for name in range(len(mylist)):
+    oldname = mylist[name]    
+    newname = mylist[name][3:24]+'gm2.tif'
+    rename = os.rename(oldname, newname)
+
+
+
+
 frags = ['*green.tif', '*red.tif', '*nir.tif','*nirb.tif','*re1.tif',
          '*re2.tif', '*re3.tif', '*swir1.tif','*swir2.tif']
 
