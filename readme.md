@@ -25,6 +25,8 @@ Machine learning terminology found across tutorials and courses:
 4.   Features: 'x', predictors
 
 Dataframe contains grassland vegetation information collected over three regions in Germany. Each region has 50 plots, and each plot is sampled in May for 4 years: 2017-2020
+
+
 ![png](Studysite.png)
 
 
