@@ -429,7 +429,7 @@ sns.pairplot(Mydataset_0[['nir_4','biomass_g']], diag_kind="biomass_g")
 
 
     
-![png](output_25_1.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_25_1.png)
     
 
 
@@ -510,7 +510,7 @@ Mypredictions = pd.merge(rsdf, MydatasetLUI)
 
 
     
-![png](output_32_1.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_32_1.png)
     
 
 
@@ -549,7 +549,7 @@ plt.show()
 
 
     
-![png](output_36_0.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_36_0.png)
     
 
 
@@ -598,7 +598,7 @@ plt.show()
 
 
     
-![png](output_39_0.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_39_0.png)
     
 
 
@@ -838,7 +838,7 @@ plt.show()
 
 
     
-![png](output_50_0.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_50_0.png)
     
 
 
@@ -873,7 +873,7 @@ predictions_list = spcv_DNN.predictions_list
 
 
     
-![png](output_53_0.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_53_0.png)
     
 
 
@@ -978,7 +978,7 @@ RMSE_val = hist[(hist.epoch == (EPOCHS - 1))][['val_root_mean_squared_error']].s
 
 
     
-![png](output_60_1.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_60_1.png)
     
 
 
@@ -1098,7 +1098,7 @@ plt.show()
 
 
     
-![png](output_79_0.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_79_0.png)
     
 
 
@@ -1110,7 +1110,7 @@ plt.show()
 
 
     
-![png](output_80_0.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_80_0.png)
     
 
 
@@ -1173,7 +1173,7 @@ plt.imshow(prediction.squeeze())
 
 
     
-![png](output_90_1.png)
+![image](https://github.com/Havi-muro/SeBAS_project/blob/main/readme%20imgs/output_90_1.png)
     
 
 
