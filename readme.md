@@ -27,11 +27,11 @@ Machine learning terminology found across tutorials and courses:
 Dataframe contains grassland vegetation information collected over three regions in Germany. Each region has 50 plots, and each plot is sampled in May for 4 years: 2017-2020
 
 
-![png](Studysite.png)
+![png](readme imgs/Studysite.png)
 
 
 Predictors are the interpolated spectral data from the 10 bands of Sentinel-2 at 16 time stamps: from April to October, every 14 days.
-![png](S2_NIR_2017_2020_AEG03.png)
+![png](readme imgs/S2_NIR_2017_2020_AEG03.png)
 
 
 ## Import libraries and data
