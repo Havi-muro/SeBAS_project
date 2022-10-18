@@ -33,7 +33,7 @@ import rasterio as rio
 
 from glob import glob
 
-explo = 'hai'
+explo = 'alb'
 year = '2021'
 
 
@@ -46,7 +46,7 @@ file_list1 = glob(f'{explo}*_b*.tif')
 # list comprehension to get a list with the dates for the biomass model
 sliced = [x[4:12] for x in file_list1]
 
-# remote duplicates so we get the list of dates
+# remove duplicates so we get the list of dates
 sliced_u = list(set(sliced))
 
 # Read model
@@ -86,14 +86,26 @@ for i in range(len(sliced_u)):
 
 # Playground
 
+# Write the stacked images individually
+for i in range(len(sliced_u)):
+    
+    # List with bands
+    glist = glob(f'{explo}*{sliced_u[i]}*_b*.tif')
+    glist = glist[0:10]
+    
+    # stack bands with earthpy    
+    arr_st, meta = es.stack(glist)
+    
+    #raster.export(arr_st, meta, filename=f'{explo}_{sliced_u[i]}_stack.tif', dtype='float')
+
+    # write the full stack in case it is necessary
+    #meta.update(count = arr_st.shape[0])
+    with rio.open(f'{explo}_{sliced_u[i]}_stack.tif', 'w', **meta, BIGTIFF='YES') as dst:
+            dst.write(arr_st)
 
 
 
-
-
-
-
-
+#clip to a smaller extent
 
 
 

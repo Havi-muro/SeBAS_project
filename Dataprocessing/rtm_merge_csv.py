@@ -23,7 +23,7 @@ sebas = pd.read_csv('C:/Users/rsrg_javier/Desktop/SEBAS/Fieldwork/Data4bexis/Cop
 sebas['Brown_veg_perc_cover'] = sebas['Senescent_percent_cover']+sebas['Moribund_percent_cover']
 
 # read cwm data
-allCWM = pd.read_csv('C:/Users/rsrg_javier/Desktop/SEBAS/Fieldwork/CWMs/sebas_cwm_traits.csv')
+allCWM = pd.read_csv('C:/Users/rsrg_javier/Desktop/SEBAS/Fieldwork/CWMs/sebas_cwm_traits_new.csv')
 
 # merge cwm and sebas data
 sebas = sebas.merge(allCWM, on=['Qnum', 'month', 'year'])
@@ -65,17 +65,20 @@ for trait in traitls:
 # select relevant columns
 mycols = ['Exploratory', 'Qnum', 'month', 'year', 
           'LAI_field', 'Green_veg_percent_cover','Brown_veg_perc_cover', 
-          'Hveg_cwm', 'Hrep_cwm', 'SPAD_cwm', 'LDMC_cwm',
-          'LA_cwm', 'SLA_cwm', 'rel_LWC_cwm', 'LWC_cwm', 'LMA_cwm',
+          'Hveg_m_cwm',
+ 'Hrep_m_cwm',
+ 'SPAD_cwm',
+ 'LDMC_g/m2_cwm',
+ 'LWC_g/m2_cwm',
+ 'LA_m2_cwm',
+ 'SLA_m2/g_cwm',
+ 'LMA_g/m2_cwm',
           'LAI_rtm','laiCab_rtm', 'laiCm_rtm', 'laiCw_rtm']
 
 sebas_cols = sebas[mycols]
 
-sebas_cols.columns=['Exploratory', 'Qnum', 'month', 'year', 
-          'LAI_cwm', 'Green_veg_percent_cover','Brown_veg_perc_cover', 
-          'Hveg_cwm', 'Hrep_cwm', 'Cab_cwm', 'Cm_cwm',
-          'LA_cwm', 'SLA_cwm', 'rel_Cw_cwm', 'Cw_cwm', 'LMA_cwm',
-          'laiLAI_rtm','laiCab_rtm', 'laiCm_rtm', 'laiCw_rtm']
+sebas_cols = sebas_cols.rename(columns={'laiCm_rtm' : 'laiCm_g/m2_rtm', 
+                                        'laiCw_rtm':'laiCw_g/m2_rtm' })
 
 # make a list with the sch campaign where LAI readings are too high
 schlai=sebas_cols[(sebas_cols['Exploratory']=='SCH') 
@@ -89,35 +92,37 @@ sebas_nosch = pd.merge(sebas_cols, schlai,
 
 ##############################################################################
 # select trait to plot
-for trait in traitls:
-    toplot = sebas_nosch[[f'{trait}_cwm', f'lai{trait}_rtm']]
-    toplot = toplot.dropna()
+# for trait in traitls:
+#     toplot = sebas_nosch[[f'{trait}*_cwm', f'lai{trait}_rtm']]
+#     toplot = toplot.dropna()
         
-    # Density plot
-    x=toplot.iloc[:,0]
-    y=toplot.iloc[:,1]
+#     # Density plot
+#     x=toplot.iloc[:,0]
+#     y=toplot.iloc[:,1]
     
-    # Calculate the point density
-    xy = np.vstack([x,y])
-    z = gaussian_kde(xy)(xy)
+#     # Calculate the point density
+#     xy = np.vstack([x,y])
+#     z = gaussian_kde(xy)(xy)
     
-    fig, ax = plt.subplots()
-    ax.scatter(x, y, c=z, s=50)
+#     fig, ax = plt.subplots()
+#     ax.scatter(x, y, c=z, s=50)
     
-    plt.ylabel(f'{trait} RTM')
-    plt.xlabel(f'In situ {trait}')
+#     plt.ylabel(f'{trait} RTM')
+#     plt.xlabel(f'In situ {trait}')
     
-    #add a r=1 line
-    line = np.array([0,max(y)])
-    plt.plot(line,line,lw=1, c="black")
-    plt.show()
+#     #add a r=1 line
+#     line = np.array([0,max(y)])
+#     plt.plot(line,line,lw=1, c="black")
+#     plt.show()
 
 # Density plot
-toplot = sebas_nosch[['Cab_cwm', 'laiCab_rtm']]
+toplot = sebas_nosch[['LWC_g/m2_cwm', 'laiCw_g/m2_rtm']]
+toplot = sebas_nosch[['LDMC_g/m2_cwm', 'laiCm_g/m2_rtm']]
+
 toplot = toplot.dropna()
 
 x=toplot.iloc[:,0]
-y=toplot.iloc[:,1]*10
+y=toplot.iloc[:,1]
 
 # Calculate the point density
 xy = np.vstack([x,y])
@@ -126,8 +131,8 @@ z = gaussian_kde(xy)(xy)
 fig, ax = plt.subplots()
 ax.scatter(x, y, c=z, s=50)
 
-plt.ylabel(f'{trait} RTM')
-plt.xlabel(f'In situ {trait}')
+plt.ylabel(list(toplot.columns)[1]+'RTM')
+plt.xlabel(list(toplot.columns)[0]+'in situ')
 
 #add a r=1 line
 line = np.array([0,max(y)])
