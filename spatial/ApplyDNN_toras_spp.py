@@ -34,12 +34,12 @@ from pyrsgis.convert import changeDimension
 
 import geopandas as gpd
 import rioxarray as rxr
-#import rasterio as rio
+import rasterio as rio
 from shapely.geometry import mapping
 
 from glob import glob
 
-explo = 'alb'
+explo = 'hai'
 year = '2019'
 
 # open with os so that shashes and capitals don't matter
@@ -62,6 +62,20 @@ file_list = glob(f'{explo}*_b*.tif')
 
 # stack bands with earthpy
 arr_st, meta = es.stack(file_list)
+
+###############################################################################
+# stack with rasterio. 
+# Writting the tiff file uses up 4 times more space than with earthpy
+# src = rio.open(file_list[0])
+
+# meta = src.meta
+# meta
+
+# meta.update(count=len(file_list))
+# with rio.open("rio_stack.tif", "w", **meta) as dst:
+#     for id, layer in enumerate(file_list, start=1):
+#         with rio.open(layer) as src:
+#             dst.write(src.read(1), id)
 
 ###############################################################################
 
@@ -88,7 +102,7 @@ myrast_reshape = changeDimension(arr_st)
 # changeDimension will be changed to array_to_table()
 
 # Read model
-pathspp = os.path.join('C:\\','Users','rsrg_javier','Documents','GitHub','SeBAS_project','spatial','SpecRichness_adam_model_S2bands_20July')
+pathspp = os.path.join('C:\\','Users','rsrg_javier','Documents','GitHub','SeBAS_project','spatial','SpecRichness_adam_model_S2bands_02Sep')
 model = keras.models.load_model(pathspp)
 
 #Apply model
@@ -102,12 +116,12 @@ prediction = np.reshape(myrast_pred, (arr_st.shape[1], arr_st.shape[2]))
 
 # more than 70 spp per 4 x 4 is not reasonable, so we eliminate those values
 #clipped_pred = np.clip(prediction, 0, 100, out=None)
-prediction[prediction>70] = np.nan
+prediction[prediction>81] = np.nan
 
 # Open one of the bands to get the metadata with pyrsgis.raster
 ds1, myrast = raster.read(file_list[1], bands=1)
 
-raster.export(prediction, ds1, filename=f'{explo}_spprich_{year}.tif', dtype='float')
+raster.export(prediction, ds1, filename=f'{explo}_spprich_{year}_81_max.tif', dtype='float')
 
 # clip:  We have to read the prediction with rasterio to apply rio.clip
 # set path to mask and open it
@@ -116,12 +130,12 @@ mask = gpd.read_file(path2mask+f'{explo}_grass_aoa_2020.shp')
 mask.crs
 
 # Get spp richness file
-spp = rxr.open_rasterio(f'{explo}_spprich_{year}.tif', masked=True).squeeze()
+spp = rxr.open_rasterio(f'{explo}_spprich_{year}_81_max.tif', masked=True).squeeze()
 spp.rio.crs
 
 # clip and export
 sppcl = spp.rio.clip(mask.geometry.apply(mapping, mask.crs)) # This is needed if your GDF is in a diff CRS than the raster data
-sppcl.rio.to_raster(f'{explo}_spprich_{year}_clip.tif')
+sppcl.rio.to_raster(f'{explo}_spprich_{year}_81_max_clip.tif')
 
 ##############################################################################
 

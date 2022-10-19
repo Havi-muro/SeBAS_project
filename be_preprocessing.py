@@ -92,9 +92,6 @@ def be_preproc(studyvar):
                ], axis=1)
     elif studyvar == 'biomass_g':
         # Remove all columns that start with 
-        #Mydataset_vars= Mydataset_vars.loc[:,~Mydataset_vars.columns.str.startswith('re3')]
-        
-        #Mydataset_vars= Mydataset_vars.loc[:,Mydataset_vars.columns.str.startswith('re3')]
         
         # Select study variable and predictors by subsetting
         # keep variable 'explo' for spatial cross-validation
@@ -120,8 +117,10 @@ def be_preproc(studyvar):
                                         ]]
     else:
         print('study var names: SpecRichness or biomass_g (as string)')
-        
-    
+    # Remove all columns that start with     
+    Mydataset_vars= Mydataset_vars.loc[:,~Mydataset_vars.columns.str.startswith('re3')]
+    Mydataset_vars= Mydataset_vars.loc[:,~Mydataset_vars.columns.str.startswith('swir2')]
+    #Mydataset_vars= Mydataset_vars.loc[:,~Mydataset_vars.columns.str.startswith('blue')]
     # nir_3 corresponds to Mid may. 
     # The differences in correlation between the orignial band and nir_3
     # correspond to SCH, because the original is two weeks later

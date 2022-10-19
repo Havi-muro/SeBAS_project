@@ -35,11 +35,12 @@ import be_preprocessing
 # Create an object with the result of  the preprocessing module
 # We have to define this to explore the dataset we work with
 # and to relate results to other variables in the plots afterwards
-studyvar = 'biomass_g'
+studyvar = 'SpecRichness'
 
 Mydataset = be_preprocessing.be_preproc(studyvar)[0]
 Mydataset = Mydataset.drop('ep', axis=1)
 print(Mydataset.head())
+
 
 import modelDNN
 
@@ -91,7 +92,7 @@ outdir = os.path.join('C:\\','Users','rsrg_javier','Documents','GitHub','SeBAS_p
 
 
 tf.keras.models.save_model(model, filepath=outdir+f'\\{studyvar}_adam_model_S2bands_02Sep')
-model.save(f'spatial/{studyvar}_adam_model_S2bands_20July')
+model.save(f'spatial/{studyvar}_adam_model_S2b_8bands_re3swir2out_oct2022')
 
 
 
