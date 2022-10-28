@@ -108,8 +108,6 @@ Olds/
 Dataprocessing/
 results/
 data/Old/
-spatial/Dataprocessing
-
 
 # mypy
 .mypy_cache/
