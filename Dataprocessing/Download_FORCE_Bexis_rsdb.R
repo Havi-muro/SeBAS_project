@@ -3,11 +3,7 @@
 # band by band                                                                #
 #                                                                             #
 # You can browse the images datset in:                                        #  
-#                                                                             #    
-#               https://vhrz1078.hrz.uni-marburg.de:8201                      #
-#                                                                             #
-#                     user: javier.muro                                       #
-#                   password: Ye72UZYkpU!Y                                    #
+
 #                                                                             #
 #                                                                             #
 ###############################################################################
