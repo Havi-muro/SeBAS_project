@@ -23,7 +23,7 @@ library(stringr)
 #??RSDB
 
 # create connection to RSDB server.
-remotesensing <- RSDB::RemoteSensing$new(url = "https://vhrz1078.hrz.uni-marburg.de:8201", userpwd = 'javier.muro:Ye72UZYkpU!Y')
+remotesensing <- RSDB::RemoteSensing$new(url = "https://vhrz1078.hrz.uni-marburg.de:8201", userpwd = 'xxxxxxxx')
 
 # name variables
 explo = 'hai'
