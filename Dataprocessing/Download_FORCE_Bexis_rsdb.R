@@ -6,8 +6,8 @@
 #                                                                             #    
 #               https://vhrz1078.hrz.uni-marburg.de:8201                      #
 #                                                                             #
-#                     user: javier.muro                                       #
-#                   password: Ye72UZYkpU!Y                                    #
+#                     user: xxx                                       #
+#                   password: xxx                                    #
 #                                                                             #
 #                                                                             #
 ###############################################################################
@@ -27,7 +27,7 @@ library(stringr)
 #??RSDB
 
 # create connection to RSDB server.
-remotesensing <- RSDB::RemoteSensing$new(url = "https://vhrz1078.hrz.uni-marburg.de:8201", userpwd = 'javier.muro:Ye72UZYkpU!Y')
+remotesensing <- RSDB::RemoteSensing$new(url = "https://vhrz1078.hrz.uni-marburg.de:8201", userpwd = 'xxxxx')
 
 # name variables
 explo = 'hai'

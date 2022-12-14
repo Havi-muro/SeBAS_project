@@ -20,6 +20,10 @@ from keras.callbacks import EarlyStopping
 #from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
+from scipy.stats import gaussian_kde
+import matplotlib.pyplot as plt
+
+
 #Import function to display loss
 from plot_loss import plot_loss
 
@@ -74,6 +78,11 @@ def gkfold_DNN(EPOCHS, studyvar):
         normalizer.adapt(np.array(train_features))
         
         #######################################################################
+        # Important note: the model module is imported outside the loop
+        # But the function that builds it is run inside the loop, so that
+        # the model is rebuild with each fold.
+        # If the model is build outside the loop, it will learn with each fold
+        # and we don't want that
         model = modelDNN.build_model(normalizer, train_features)
         #model.summary()
         #######################################################################
@@ -98,15 +107,34 @@ def gkfold_DNN(EPOCHS, studyvar):
         hist = pd.DataFrame(history.history)
         hist['epoch'] = history.epoch
            
-        plot_loss(history, EPOCHS, studyvar)
+        #plot_loss(history, EPOCHS, studyvar)
               
         #Predictions
         #Make predictions on the test data using the model, and stored results of each fold
         test_predictions = model.predict(test_features).flatten()
         
+               
         c = pd.concat([pd.Series(test_labels), pd.Series(test_predictions)], axis=1)
         c.columns = ['labels', 'preds']
         pred_trues.append(c)
+        
+        yy = c['preds']
+        xx = c['labels']
+        
+        # Calculate the point density
+        xxyy = np.vstack([xx,yy])
+        z = gaussian_kde(xxyy)(xxyy)
+        
+        fig, ax = plt.subplots()
+        ax.scatter(xx, yy, c=z, s=100)
+        
+
+        plt.ylabel(f'Predicted {studyvar}')
+        plt.xlabel(f'In situ {studyvar}')
+        #add a r=1 line
+        line = np.array([0,max(Mydataset[studyvar])])
+        plt.plot(line,line,lw=1, c="black")
+        plt.show() 
                         
     return model
           
