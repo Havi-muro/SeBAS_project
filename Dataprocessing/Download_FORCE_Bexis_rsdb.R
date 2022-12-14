@@ -1,15 +1,7 @@
 ###############################################################################
 # This code accesses the bexis remote sensing database and downloads the imgs #
 # band by band                                                                #
-#                                                                             #
-# You can browse the images datset in:                                        #  
-#                                                                             #    
-#               https://vhrz1078.hrz.uni-marburg.de:8201                      #
-#                                                                             #
-#                     user: xxx                                       #
-#                   password: xxx                                    #
-#                                                                             #
-#                                                                             #
+
 ###############################################################################
 
 # Install RSDB package and automatically install updated versions.

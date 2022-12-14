@@ -1,4 +1,4 @@
-This models have been calibrated removing the re3 and swir2 bands in one (8 bands), and removing re3, swir2 and blue bands in the other one (7 bands).
+These models have been calibrated removing the re3 and swir2 bands in one (8 bands), and removing re3, swir2 and blue bands in the other one (7 bands).
 Therefore, they have to be applied to stacks of 8x16 time steps and 7x16 time steps.
 
 Re3 and swir2 are highly correlated with re2 and swir1 respectively, and blue band tends to be noisy.
