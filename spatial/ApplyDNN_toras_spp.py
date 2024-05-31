@@ -14,7 +14,7 @@ Making no data values is only for visualization purposes.
 """
 #conda install -c conda-forge earthpy
 #import earthpy as et
-import earthpy.spatial as es
+#import earthpy.spatial as es
 #import earthpy.plot as ep
 
 #import matplotlib.pyplot as plt
@@ -25,11 +25,11 @@ import numpy as np
 from tensorflow import keras
 
 import os
-#conda install -c pratyusht pyrsgis
-#conda install --channel "pratyusht" package
+conda install -c pratyusht pyrsgis
+conda install --channel "pratyusht" package
 #import pyrsgis
-from pyrsgis import raster
-from pyrsgis.convert import changeDimension
+#from pyrsgis import raster
+#from pyrsgis.convert import changeDimension
 #from pyrsgis import convert
 
 import geopandas as gpd
@@ -39,16 +39,23 @@ from shapely.geometry import mapping
 
 from glob import glob
 
-explo = 'hai'
-year = '2019'
-
 # open with os so that shashes and capitals don't matter
-os.chdir(os.path.join('D:/','SeBAS_RS','RS',explo,f'{explo}{year}'))
+rasdir = os.path.join(r'C:\Users\muro\Downloads\alb')
 
 ##############################################################################################
             
 # Import all bands in a list and stack them (spp richness)
-file_list = glob(f'{explo}*_b*.tif')
+
+
+
+file_list = glob(rasdir+'\*.tif*')
+
+file_list2 = []
+for i in file_list:
+    src = rio.open(i).read()
+    file_list2.append(src)
+    
+    
 
 # In case we need to remove some band
 #file_list = [i for i in file_list if not i.endswith('b06.tif')]
@@ -61,7 +68,7 @@ file_list = glob(f'{explo}*_b*.tif')
 # file_list_s = [file_list[i] for i in [10, 0, 1,2,3,4,5,6,7,8,9]]
 
 # stack bands with earthpy
-arr_st, meta = es.stack(file_list)
+arr_st = np.stack(file_list2, axis=0)
 
 ###############################################################################
 # stack with rasterio. 
@@ -98,11 +105,14 @@ arr_st, meta = es.stack(file_list)
 
 #Change raster dimensions. 
 #No need to normalize, since the model performs normalization
-myrast_reshape = changeDimension(arr_st)
+#myrast_reshape = changeDimension(arr_st)
+myrast_transpose = arr_st.transpose(2,3,0,1)
+myrast_reshape = myrast_transpose.reshape((myrast_transpose.shape[0]*myrast_transpose.shape[1]),160)
+
 # changeDimension will be changed to array_to_table()
 
 # Read model
-pathspp = os.path.join('C:\\','Users','rsrg_javier','Documents','GitHub','SeBAS_project','spatial','SpecRichness_adam_model_S2bands_02Sep')
+pathspp = os.path.join(r'C:\Users\muro\Documents\GitHub\SeBAS_project\spatial\NMDS1_adam_model')
 model = keras.models.load_model(pathspp)
 
 #Apply model
@@ -116,12 +126,12 @@ prediction = np.reshape(myrast_pred, (arr_st.shape[1], arr_st.shape[2]))
 
 # more than 70 spp per 4 x 4 is not reasonable, so we eliminate those values
 #clipped_pred = np.clip(prediction, 0, 100, out=None)
-prediction[prediction>81] = np.nan
+#prediction[prediction>81] = np.nan
 
 # Open one of the bands to get the metadata with pyrsgis.raster
 ds1, myrast = raster.read(file_list[1], bands=1)
 
-raster.export(prediction, ds1, filename=f'{explo}_spprich_{year}_81_max.tif', dtype='float')
+raster.export(prediction, ds1, filename='alb_spprich_2021.tif', dtype='float')
 
 # clip:  We have to read the prediction with rasterio to apply rio.clip
 # set path to mask and open it

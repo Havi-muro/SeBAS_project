@@ -20,13 +20,13 @@ from keras.callbacks import EarlyStopping
 
 
 import tensorflow as tf
-#from tensorflow import keras
-#from tensorflow.keras import layers
+from tensorflow import keras
+from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
 import os
 
-os.chdir(os.path.join('C://','Users','rsrg_javier','Documents','GitHub','SeBAS_project'))
+os.chdir(os.path.join(r'C:\Users\muro\Documents\GitHub\SeBAS_project'))
 
 # Preprocess data
 # in be_preprocessing.py, select the study variable and the predictors
@@ -35,14 +35,54 @@ import be_preprocessing
 # Create an object with the result of  the preprocessing module
 # We have to define this to explore the dataset we work with
 # and to relate results to other variables in the plots afterwards
-studyvar = 'SpecRichness'
+studyvar = 'Shannon'
+
+
+
 
 Mydataset = be_preprocessing.be_preproc(studyvar)[0]
+
 Mydataset = Mydataset.drop('ep', axis=1)
 print(Mydataset.head())
 
 
 import modelDNN
+
+
+
+# define model
+def build_model(normalizer, train_features):
+  model = keras.Sequential([
+    normalizer,
+    layers.Dense(64, 
+                 activation='relu', 
+                 kernel_regularizer=keras.regularizers.l1(0.01),
+                 input_shape=train_features.shape),#!!! We had to change here to get the shape from the np array
+   
+    #layers.Dropout(0.2),
+        
+    layers.Dense(64, activation='relu',
+                 kernel_regularizer=keras.regularizers.l1(0.01),
+                 ),
+    
+    #layers.Dropout(0.2),
+
+    layers.Dense(64, activation='relu',
+                  kernel_regularizer=keras.regularizers.l1(0.01),
+                  ),
+    
+    #layers.Dropout(0.2),
+
+    
+    layers.Dense(1)
+  ])
+
+  #optimizer = tf.keras.optimizers.RMSprop(0.001)
+  model.compile(loss='mae',
+                optimizer='adam',
+                metrics=[tf.keras.metrics.RootMeanSquaredError()])
+                #metrics=['mae','mse'])
+  return model
 
 # Random Distribution of train and test
 train_dataset = Mydataset

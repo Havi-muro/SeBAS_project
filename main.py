@@ -34,7 +34,7 @@ import math
 import os
 from scipy.stats import gaussian_kde
 
-os.chdir(os.path.join('C://','Users','rsrg_javier','Documents','GitHub','SeBAS_project'))
+os.chdir(os.path.join(r'C:\Users\muro\Documents\GitHub\SeBAS_project'))
 
 # Preprocess data
 # in be_preprocessing.py, select the  the predictors
@@ -302,7 +302,7 @@ for i in range(3):
     
     zb = [obar,pbar,sdo,sdp,r,a,b,mae,d1,rmse,rrmse,rmses,rmseu,d2]
     
-    results = [r2, rrmse, rmses, rmseu]
+    results = [r2, rrmse, rmses, rmseu, rmse]
     
     met_ls.append(results)
  
@@ -323,6 +323,10 @@ rmses_sd = statistics.pstdev([x[2] for x in met_ls])
 rmseu_hat = statistics.mean([x[3] for x in met_ls])
 rmseu_sd = statistics.pstdev([x[3] for x in met_ls])
 
+rmse_hat = statistics.mean([x[4] for x in met_ls])
+rmse_sd = statistics.pstdev([x[4] for x in met_ls])
+
+
 print('r2_hat: ' '%.2f'% r2_hat)
 print('r2_sd: ''%.2f'% r2_sd)
 
@@ -334,6 +338,9 @@ print(f'rmses_sd: ' '%.2f'%rmses_sd)
 
 print(f'rmseu_hat: ' '%.2f'% rmseu_hat)
 print(f'rmseu_sd: ' '%.2f'%rmseu_sd)
+
+print(f'rmse_hat: ' '%.2f'% rmse_hat)
+print(f'rmse_sd: ' '%.2f'%rmse_sd)
 
 # Shut down spider after every run, because some variables
 # or coefficients remain stored somewhere
